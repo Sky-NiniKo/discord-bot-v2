@@ -1,7 +1,7 @@
 # Run at home (only Windows and Linux are supported)
 Fist install all python dependencies of requ et if you are on linux install all packages in Aptfile with apt.
 
-In the `resource folder`, create a new `credentials` folder and put 2 files in it, `creds.ini` and `gcreds.json` that you get from this tutorial https://www.youtube.com/watch?v=cnPlKLEGR7E&t=32s.
+In the `resource` folder, create a new `credentials` folder and put 2 files in it, `creds.ini` and `gcreds.json` that you get from this tutorial https://www.youtube.com/watch?v=cnPlKLEGR7E&t=32s.
 ## creds.ini
 Fill creds.ini like this (the information with a * are essential to start the program and the one with a ¤ are essential to have all the functionalities of the bot and not to have any error)
 ```ini
