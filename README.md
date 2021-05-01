@@ -1,5 +1,5 @@
 # Run at home (only Windows and Linux are supported)
-Fist install all python dependencies of requ et if you are on linux install all packages in Aptfile with apt.
+First install all python dependencies of requirements.txt and if you are on Linux install all packages in Aptfile with apt.
 
 In the `resource` folder, create a new `credentials` folder and put 2 files in it, `creds.ini` and `gcreds.json` that you get from this tutorial https://www.youtube.com/watch?v=cnPlKLEGR7E&t=32s.
 ## creds.ini
@@ -24,7 +24,9 @@ Discord account ID: https://support.discord.com/hc/en-us/articles/206346498-Wher
 
 Imgur API: https://api.imgur.com/#registerapp
 
-Google Sheet ID: In a typical Google Sheet URL -> https://docs.google.com/spreadsheets/d/ (Is it here) /
+Google Sheet ID: In a typical Google Sheet URL → https://docs.google.com/spreadsheets/d/ (Is it here) /
+## Start
+If you are on Windows launch main.py and if you are on Linux launch start.sh
 
 # Difficulties or you want more information
 Open an issue https://github.com/Sky-NiniKo/discord-bot-v2/issues/new/choose
