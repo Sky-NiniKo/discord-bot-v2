@@ -25,6 +25,8 @@ Discord account ID: https://support.discord.com/hc/en-us/articles/206346498-Wher
 Imgur API: https://api.imgur.com/#registerapp
 
 Google Sheet ID: In a typical Google Sheet URL → https://docs.google.com/spreadsheets/d/ (Is it here) /
+## Start
+If you are on Windows launch main.py and if you are on Linux launch start.sh
 
 # Difficulties or you want more information
 Open an issue https://github.com/Sky-NiniKo/discord-bot-v2/issues/new/choose
