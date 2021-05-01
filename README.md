@@ -28,5 +28,5 @@ Google Sheet ID: In a typical Google Sheet URL → https://docs.google.com/sprea
 ## Start
 If you are on Windows launch main.py and if you are on Linux launch start.sh
 
-# Difficulties or you want more information
+## Difficulties or you want more information
 Open an issue https://github.com/Sky-NiniKo/discord-bot-v2/issues/new/choose

@@ -4,11 +4,12 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import Bot
 
-from python_script.utils import is_in, values_from_one
-from python_script.reaction import QuickDelete
-from python_script.game import GameEngine
-from python_script.sheet import AvatarHistory, Statistics
 from python_script.activity import Activity
+from python_script.calculator import calculate
+from python_script.game import GameEngine
+from python_script.reaction import QuickDelete
+from python_script.sheet import AvatarHistory, Statistics
+from python_script.utils import is_in, values_from_one
 
 
 class Command(commands.Cog):
@@ -18,7 +19,7 @@ class Command(commands.Cog):
         self.quick_delete = quick_delete
         self.game = game
         self.avatar_history = avatar_history
-        self.statistics = Statistics(sheet_s)
+        self.statistics_sheet = Statistics(sheet_s)
         self.activity = activity
         self.command_list = {"?": ("help", "aide", "?"), "=": ("=", "calc"), "clear_all": ("clearA", "videA", "purgeA"),
                              "clear": ("vide", "clear", "propre", "nettoyer", "purge"), "aliases": ("aliases",),
@@ -27,7 +28,7 @@ class Command(commands.Cog):
                              "update_game_template": ("update_game_template", "update_modèle"), "code": ("code",),
                              "add_event": ("add_event", "+event"), "avatar": ("avatar", "skin"),
                              "event_list": ("event", "event_list"), "pile_ou_face": ("pile_ou_face", "pf"),
-                             "statistics": ("statistique", "stat")}
+                             "statistics_sheet": ("statistique", "stat")}
 
     """
     command
@@ -39,20 +40,23 @@ class Command(commands.Cog):
         self.activity.add(date, event_type, activity_name)
         msg = await ctx.send("Votre événement a été correctement enregister")
         await self.quick_delete.add([msg, ctx.message])
-        self.statistics.add(str(ctx.author), "add_event")
-    
+        self.statistics_sheet.add(str(ctx.author), "add_event")
+
     @commands.command(aliases=["skin"])
     async def avatar(self, ctx):
         msg = await ctx.send("https://docs.google.com/spreadsheets/d/18yuov4obW1oIdaOO-SUivX_owepN6op-Nte8Vz-m4fQ/")
         await self.quick_delete.add([msg, ctx.message])
-        self.statistics.add(str(ctx.author), "avatar")
+        self.statistics_sheet.add(str(ctx.author), "avatar")
 
     @commands.command(aliases=["=", "calc"])
     async def calculate(self, ctx):
         content = ctx.message.content
-        msg = await ctx.send(eval(content[content.find("=") + 1:]))
+        try:
+            msg = await ctx.send(calculate(content[content.find("=") + 1:]))
+        except TypeError:
+            msg = await ctx.send("Désoler mais je ne peux pas calculer ceci.")
         await self.quick_delete.add([msg, ctx.message])
-        self.statistics.add(str(ctx.author), "calculate")
+        self.statistics_sheet.add(str(ctx.author), "calculate")
 
     @commands.command(aliases=["vide", "propre", "nettoyer", "purge"])
     async def clear(self, ctx, number: int):
@@ -63,7 +67,7 @@ class Command(commands.Cog):
                 await msg.delete()
                 number -= 1
         await self.quick_delete.add([ctx.message])
-        self.statistics.add(str(ctx.author), "clear")
+        self.statistics_sheet.add(str(ctx.author), "clear")
 
     @commands.command(aliases=["clearA", "videA", "purgeA"])
     @commands.has_permissions(manage_messages=True)
@@ -71,13 +75,13 @@ class Command(commands.Cog):
         number = int(number)
         async for msg in ctx.message.channel.history(limit=number + 1):
             await msg.delete()
-        self.statistics.add(str(ctx.author), "clear_all")
+        self.statistics_sheet.add(str(ctx.author), "clear_all")
 
     @commands.command()
     async def code(self, ctx):
         msg = await ctx.author.send("https://github.com/Sky-NiniKo/discord-bot-v2")
         await self.quick_delete.add([msg, ctx.message])
-        self.statistics.add(str(ctx.author), "code")
+        self.statistics_sheet.add(str(ctx.author), "code")
 
     @commands.command(aliases=["dé", "de"])
     async def dice(self, ctx, *args):
@@ -92,7 +96,7 @@ class Command(commands.Cog):
             msgs += [await ctx.send(file=discord.File(f"resource/assets/dice/{answer}.png"), delete_after=3600)]
         msgs += [await ctx.send(f"Le dé est tombé sur {answer}")]
         await self.quick_delete.add(msgs + [ctx.message])
-        self.statistics.add(str(ctx.author), "dice")
+        self.statistics_sheet.add(str(ctx.author), "dice")
 
     @commands.command(aliases=["event"])
     async def event_list(self, ctx):
@@ -102,7 +106,7 @@ class Command(commands.Cog):
         else:
             msg = await ctx.send("Il n'y a pas d'événement prévu")
         await self.quick_delete.add([msg, ctx.message])
-        self.statistics.add(str(ctx.author), "event_list")
+        self.statistics_sheet.add(str(ctx.author), "event_list")
 
     @commands.command(aliase=["pf"])
     async def pile_ou_face(self, ctx):
@@ -110,33 +114,33 @@ class Command(commands.Cog):
         msg2 = await ctx.send(file=discord.File(f"resource/assets/pièce/{answer.lower()}.png"), delete_after=3600)
         msg = await ctx.send(answer)
         await self.quick_delete.add([msg, msg2, ctx.message])
-        self.statistics.add(str(ctx.author), "pile_ou_face")
+        self.statistics_sheet.add(str(ctx.author), "pile_ou_face")
 
     @commands.command(aliases=["pg"])
     async def ping(self, ctx):
         msg = await ctx.send(f"Pong!\n{round(self.bot.latency * 1000, 3)} ms.")
         await self.quick_delete.add([msg, ctx.message])
-        self.statistics.add(str(ctx.author), "ping")
-    
+        self.statistics_sheet.add(str(ctx.author), "ping")
+
     @commands.command(aliases=["statistique", "stat"])
     async def statistics(self, ctx):
         msg = await ctx.send("https://docs.google.com/spreadsheets/d/19NMGwDkniWv3yonHGwGLE1XpoMsy9RMawI78Kwv1bGo/")
         await self.quick_delete.add([msg, ctx.message])
-        self.statistics.add(str(ctx.author), "statistique")
+        self.statistics_sheet.add(str(ctx.author), "statistique")
 
     @commands.command(aliases=["update_sheet"])
     async def update_avatar(self, ctx):
         self.avatar_history.update()
         msg = await ctx.send("L'histotique des avatars a été mis à jour.")
         await self.quick_delete.add([msg, ctx.message])
-        self.statistics.add(str(ctx.author), "update_avatar")
+        self.statistics_sheet.add(str(ctx.author), "update_avatar")
 
     @commands.command(aliases=["update_modèle"])
     async def update_game_template(self, ctx):
         await self.game.update_game_template()
         msg = await ctx.send("Les salon modèle pour les jeux ont été mis à jour.")
         await self.quick_delete.add([msg, ctx.message])
-        self.statistics.add(str(ctx.author), "update_game_template")
+        self.statistics_sheet.add(str(ctx.author), "update_game_template")
 
     @commands.command(aliases=["aliase"])
     async def aliases(self, ctx, command_name):
@@ -145,12 +149,12 @@ class Command(commands.Cog):
         except ValueError:
             msg = await ctx.send("Commande inconnue")
         await self.quick_delete.add([msg, ctx.message])
-        self.statistics.add(str(ctx.author), "aliases")
+        self.statistics_sheet.add(str(ctx.author), "aliases")
 
     @commands.command(aliases=["?"])
     async def aide(self, ctx, *args: str) -> None:
         if args:
-            if type(args[0]) == list:
+            if isinstance(args[0], list):
                 args = tuple(args[0]) + args[1:]
             if is_in(self.command_list["?"], args):
                 msg = await ctx.send("La commande `!? (commande)` permet d'obtenir de l'aide sur une commande "
@@ -193,7 +197,7 @@ class Command(commands.Cog):
                 msg = await ctx.send("Donne la liste des événement à venir.")
             elif is_in(self.command_list["pile_ou_face"], args):
                 msg = await ctx.send("Lance un pièce.\nC'est tout.")
-            elif is_in(self.command_list["statistics"], args):
+            elif is_in(self.command_list["statistics_sheet"], args):
                 msg = await ctx.send("Donne le lien du Google Sheet avec les statistiques.\n"
                                      "*Note: vous pouvez demender à ne plus apparaître "
                                      "dans les statistiques en contactant Sky NiniKo.*")
@@ -211,6 +215,7 @@ class Command(commands.Cog):
             msg = await ctx.author.send("**Besoin d'aide** sur une commande ? Faite `!? (commande)`"
                                         "\nTu veux affronter ton ami aux **puissance 4** alors fait "
                                         "`!puissance4 @(nom de ton ami)`"
+                                        "\nUne petite partie d'échecs ? Fait `!échecs @(nom de l'adversaire)"
                                         "\nJe peux faire un **calcule** avec `=(calcule)`"
                                         "\nJe peux **nettoyer mes messages** avec `!clear (nombre de messages)`"
                                         "\nTu veux savoir le **ping** du bot alors fait `!ping`"
@@ -224,14 +229,14 @@ class Command(commands.Cog):
                                         "\nJe fait des statistique et par soucie de transparance, "
                                         "tu peux **obtenir les statistiques** avec `!stat` car elles sont publique.")
         await self.quick_delete.add([msg, ctx.message])
-        self.statistics.add(str(ctx.author), "aide")
+        self.statistics_sheet.add(str(ctx.author), "aide")
 
     @commands.command(aliases=["puissance_4", "puissance4", "connect4"])
     async def connect_4(self, ctx):
         await self.game.connect_4(ctx)
-        self.statistics.add(str(ctx.author), "connect_4")
+        self.statistics_sheet.add(str(ctx.author), "connect_4")
 
     @commands.command(aliases=["échecs"])
     async def chess(self, ctx):
         await self.game.chess(ctx)
-        self.statistics.add(str(ctx.author), "chess")
+        self.statistics_sheet.add(str(ctx.author), "chess")

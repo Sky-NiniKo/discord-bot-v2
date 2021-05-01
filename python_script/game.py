@@ -1,15 +1,14 @@
 import json
 import random
 import platform
-import subprocess
 import multiprocessing
 from itertools import chain, groupby
 
 import chess
+import chess.svg
 import chess.engine
 import discord
 import requests
-from chess import svg
 from discord.ext.commands import Bot, Context
 
 from python_script.reaction import QuickDelete
@@ -115,9 +114,9 @@ class Connect4(Game):
         embed = discord.Embed(title=f"C'est à {self.players[self.player].name}", description=to_show)
         self.last_msg = await self.channel.send(embed=embed)
         if self.players[self.player] == self.bot.user:
-            request = subprocess.check_output(
-                ["curl", "-s", f"https://connect4.gamesolver.org/solve?pos={''.join(self.replay)}"], text=True)
-            values = json.loads(request.stdout)['score']
+            request = requests.get("https://connect4.gamesolver.org/solve", params=(("pos", "".join(self.replay)),),
+                                   headers={"User-Agent": ""})
+            values = json.loads(request.text)["score"]
             values = [-100 if value == 100 else value for value in values]
             await self.play(max(zip(values, range(len(values))))[1])
         else:
