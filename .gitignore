@@ -1,3 +1,6 @@
-venv
 .idea
+venv
+resource/temp
 python_script/__pycache__
+resource/credentials/creds.ini
+resource/credentials/gcreds.json
