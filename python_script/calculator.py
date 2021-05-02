@@ -43,10 +43,14 @@ def calculate(calculation):
         if time.time() - timer > 0.2:
             raise TimeoutError("Too many calculation")
     figure, _ = matplotlib.pyplot.subplots()
-    matplotlib.pyplot.plot(result, color='green', marker='o', linewidth=2, markersize=5)
-    figure.savefig("resource/temp/plot.png")
+    matplotlib.pyplot.plot(list(drange(start, stop, step)), result, color='green', marker='o', linewidth=2, markersize=5)
+    figure.savefig("../resource/temp/plot.png")
     return True
 
 
 if __name__ == '__main__':
+    import platform
+    if platform.system() == "Windows":
+        import os
+        os.environ['PATH'] = r'../resource/cairo/Windows' + ';' + os.environ['PATH']
     print((calculate(input())))

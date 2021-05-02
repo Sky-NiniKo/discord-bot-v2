@@ -54,10 +54,10 @@ class Command(commands.Cog):
         try:
             result = calculate(content[content.find("=") + 1:])
             if result is True:
-                msg = await ctx.send(file=discord.File(f"resource/temp/plot.png"))
+                msg = await ctx.send(file=discord.File("resource/temp/plot.png"))
             else:
                 msg = await ctx.send(result)
-        except TypeError:
+        except TypeError or ValueError:
             msg = await ctx.send("Désoler mais je ne peux pas calculer ceci.")
         except TimeoutError:
             msg = await ctx.send("Votre calcule est trop compliquer, je ne peux pas le traiter.")
