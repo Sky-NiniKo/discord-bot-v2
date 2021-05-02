@@ -30,9 +30,9 @@ class Command(commands.Cog):
                              "event_list": ("event", "event_list"), "pile_ou_face": ("pile_ou_face", "pf"),
                              "statistics_sheet": ("statistique", "stat")}
 
-    """
-    command
-    """
+    # --------------#
+    #    command    #
+    # --------------#
 
     @commands.command(aliases=["+event"])
     async def add_event(self, ctx, date, event_type, *activity_name):
@@ -52,9 +52,15 @@ class Command(commands.Cog):
     async def calculate(self, ctx):
         content = ctx.message.content
         try:
-            msg = await ctx.send(calculate(content[content.find("=") + 1:]))
+            result = calculate(content[content.find("=") + 1:])
+            if result is True:
+                msg = await ctx.send(file=discord.File(f"resource/temp/plot.png"))
+            else:
+                msg = await ctx.send(result)
         except TypeError:
             msg = await ctx.send("Désoler mais je ne peux pas calculer ceci.")
+        except TimeoutError:
+            msg = await ctx.send("Votre calcule est trop compliquer, je ne peux pas le traiter.")
         await self.quick_delete.add([msg, ctx.message])
         self.statistics_sheet.add(str(ctx.author), "calculate")
 

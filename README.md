@@ -1,3 +1,4 @@
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/7b33e2d1ccea4737a380004eea247b04)](https://www.codacy.com/gh/Sky-NiniKo/discord-bot-v2/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Sky-NiniKo/discord-bot-v2&amp;utm_campaign=Badge_Grade)
 # Run at home (only Windows and Linux are supported)
 First install all python dependencies of requirements.txt and if you are on Linux install all packages in Aptfile with apt.
 
