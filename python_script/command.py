@@ -1,6 +1,7 @@
 import random
 
 import discord
+from discord import HTTPException
 from discord.ext import commands
 from discord.ext.commands import Bot
 
@@ -56,7 +57,12 @@ class Command(commands.Cog):
             if result is True:
                 msg = await ctx.send(file=discord.File("resource/temp/plot.png"))
             else:
-                msg = await ctx.send(result)
+                try:
+                    msg = await ctx.send(result)
+                except HTTPException:
+                    with open("resource/temp/message.txt", "w+") as file:
+                        file.write(str(result))
+                    msg = await ctx.send(file=discord.File("resource/temp/message.txt"))
         except TypeError or ValueError:
             msg = await ctx.send("Désoler mais je ne peux pas calculer ceci.")
         except KeyboardInterrupt:
