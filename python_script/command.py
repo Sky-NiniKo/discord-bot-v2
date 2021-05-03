@@ -59,7 +59,7 @@ class Command(commands.Cog):
                 msg = await ctx.send(result)
         except TypeError or ValueError:
             msg = await ctx.send("Désoler mais je ne peux pas calculer ceci.")
-        except TimeoutError:
+        except KeyboardInterrupt:
             msg = await ctx.send("Votre calcule est trop compliquer, je ne peux pas le traiter.")
         await self.quick_delete.add([msg, ctx.message])
         self.statistics_sheet.add(str(ctx.author), "calculate")

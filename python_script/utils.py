@@ -1,3 +1,7 @@
+import _thread
+import sys
+import threading
+
 import requests
 
 Client_ID = None
@@ -49,3 +53,26 @@ def upload_image_on_imgur(*, url=None, file_path=""):
     response = requests.request("POST", api, headers=headers, data=payload, files=[])  # upload image
     rep = str(response.text.encode('utf-8')[2:-1])  # convert response in string
     return "https://i.imgur.com/" + rep[rep.find("link") + 33:rep.find(".png") + 4]  # return the link of the image
+
+
+def quit_function(fn_name):
+    sys.stderr.flush()  # Python 3 stderr is likely buffered.
+    _thread.interrupt_main()  # raises KeyboardInterrupt
+
+
+def exit_after(s):
+    """
+    use as decorator to exit process if
+    function takes longer than s seconds
+    """
+    def outer(fn):
+        def inner(*args, **kwargs):
+            timer = threading.Timer(s, quit_function, args=[fn.__name__])
+            timer.start()
+            try:
+                result = fn(*args, **kwargs)
+            finally:
+                timer.cancel()
+            return result
+        return inner
+    return outer

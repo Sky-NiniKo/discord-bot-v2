@@ -52,7 +52,7 @@ class Game:
         await self.quick_delete.wait_for_ok()
         self.quick_delete.save.add_to_delete(self.msg)
 
-    async def message(self, first_arg):
+    async def super_message(self, first_arg):
         if first_arg in generate_implicit(("close", "quit", "exit")):
             await self.channel.delete()
             self.quick_delete.save.remove(msg=self.msg)
@@ -194,7 +194,7 @@ class Connect4(Game):
 
     async def message(self, ctx: Context):
         first_arg = ctx.message.content.split()[0].lower()
-        await super(Connect4, self).message(first_arg)
+        await super(Connect4, self).super_message(first_arg)
         if not self.start:
             if first_arg in generate_implicit(("start",)):
                 self.start = True
@@ -341,7 +341,7 @@ class Chess(Game):
     async def message(self, ctx: Context):
         msg = ctx.message.content
         first_arg = msg.split()[0].lower()
-        if await super(Chess, self).message(first_arg):
+        if await super(Chess, self).super_message(first_arg):
             return
         if not self.start:
             if first_arg in generate_implicit(("start",)):
