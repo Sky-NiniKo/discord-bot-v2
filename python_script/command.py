@@ -63,7 +63,7 @@ class Command(commands.Cog):
                     with open("resource/temp/message.txt", "w+") as file:
                         file.write(str(result))
                     msg = await ctx.send(file=discord.File("resource/temp/message.txt"))
-        except TypeError or ValueError:
+        except (TypeError, ValueError):
             msg = await ctx.send("Désoler mais je ne peux pas calculer ceci.")
         except KeyboardInterrupt:
             msg = await ctx.send("Votre calcule est trop compliquer, je ne peux pas le traiter.")
