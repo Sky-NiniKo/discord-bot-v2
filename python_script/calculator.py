@@ -39,6 +39,8 @@ def evaluate(string: str, additional_dict=None):
         try:
             float(number)
         except ValueError:
+            if "^" in number:
+                string = string.replace(number, [digit for digit in number if digit == "^"])
             numbers.remove(number)
     for number in numbers:
         string = string.replace(number, "PuT@Number", 1)
