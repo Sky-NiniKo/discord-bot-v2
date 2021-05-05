@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 import requests
-from sympy import sympify, symbols, plot, pretty, SympifyError, latex, solveset, Eq, FiniteSet
+from sympy import sympify, symbols, plot, pretty, SympifyError, latex, solveset, Eq, FiniteSet, simplify
 from sympy.plotting import plot3d
 
 from python_script.utils import exit_after
@@ -33,11 +33,16 @@ def graph3d(calculation, **kwargs):
 
 
 def raw_calculate(calculation):
-    ret = sympify(calculation)
-    approximation = None if ret.evalf() == ret else ret.evalf()
+    ret = sympify(calculation, evaluate=False)
+    try:
+        approximation = None if (simplify(ret) != ret or ret.is_Float or ret.is_Integer or ret.is_Rational
+                                 or ret.evalf() == ret) else ret.evalf()
+    except AttributeError:
+        approximation = None
+    ret = simplify(ret)
     if latex_need(ret):
         latex_str = latex(ret) if approximation is None else latex(ret) + r"\approx" + str(approximation)
-        with open("resource/temp/result.png", "wb") as file:
+        with open("Export/plot.png", "wb") as file:
             file.write(requests.get(f"https://latex.codecogs.com/png.download?{latex_str}").content)
         return True
     return str(ret) if approximation is None else str(ret) + " ≈ " + str(approximation)
