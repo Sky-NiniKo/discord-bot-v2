@@ -32,24 +32,24 @@ def graph3d(calculation, **kwargs):
     result.save("resource/temp/result.png")
 
 
-def raw_calculate(calculation):
+def raw_calculate(calculation, return_str=False):
     ret = sympify(calculation, evaluate=False)
-    try:
-        approximation = None if (simplify(ret) != ret or ret.is_Float or ret.is_Integer or ret.is_Rational
+    try:       # si Rationnel enlever la multiplication
+        approximation = None if (simplify(ret) != ret or ret.is_Float or ret.is_Integer
                                  or ret.evalf() == ret) else ret.evalf()
     except AttributeError:
         approximation = None
     ret = simplify(ret)
-    if latex_need(ret):
+    if latex_need(ret) and not return_str:
         latex_str = latex(ret) if approximation is None else latex(ret) + r"\approx" + str(approximation)
-        with open("Export/plot.png", "wb") as file:
+        with open("resource/temp/result.png", "wb") as file:
             file.write(requests.get(f"https://latex.codecogs.com/png.download?{latex_str}").content)
         return True
-    return str(ret) if approximation is None else str(ret) + " ≈ " + str(approximation)
+    return pretty(ret) if approximation is None else pretty(ret) + " ≈ " + str(approximation)
 
 
 @exit_after(10)
-def calculate(calculation: str, raw=False, plot_2d=False, plot_3d=False, equation_solve=False):
+def calculate(calculation: str, raw=False, plot_2d=False, plot_3d=False, equation_solve=False, return_str=False):
     if not raw:     # regarde si il n'y a pas un argument
         if calculation.startswith("solve"):
             equation_solve = True
@@ -64,7 +64,7 @@ def calculate(calculation: str, raw=False, plot_2d=False, plot_3d=False, equatio
             raw = True
     if ";" not in calculation:
         if raw:
-            return raw_calculate(calculation)
+            return raw_calculate(calculation, return_str)
         if plot_2d:
             graph(calculation)
             return True
@@ -74,13 +74,11 @@ def calculate(calculation: str, raw=False, plot_2d=False, plot_3d=False, equatio
         if equation_solve:
             right, left = map(sympify, calculation.split("=")[0:2])
             solution = solveset(Eq(right, left))
-            if latex_need(solution):
+            if latex_need(solution) and not return_str:
                 with open("resource/temp/result.png", "wb") as file:
                     file.write(requests.get(f"https://latex.codecogs.com/png.download?{latex(solution)}").content)
                 return True
-            if isinstance(solution, FiniteSet):
-                solution = set(solution)
-            return str(solution)
+            return pretty(solution)
     calculation = calculation.split(";")
     start, value, stop = calculation[1].split("<")[0:3]
     if ',' in stop:
