@@ -73,7 +73,7 @@ def calculate(calculation: str, raw=False, plot_2d=False, plot_3d=False, equatio
                 with open("resource/temp/result.png", "wb") as file:
                     file.write(requests.get(f"https://latex.codecogs.com/png.download?{latex(solution)}").content)
                 return True
-            if type(solution) == FiniteSet:
+            if isinstance(solution, FiniteSet):
                 solution = set(solution)
             return str(solution)
     calculation = calculation.split(";")

@@ -297,7 +297,7 @@ class Chess(Game):
         if self.show_analyse:
             analyse = await self.engine.analyse(self.board, chess.engine.Limit(time=0.1))
             score = analyse["score"].white()
-            if type(score) == chess.engine.Cp:
+            if isinstance(score, chess.engine.Cp):
                 pawn = int(str(score)) / 100
                 await self.channel.send(f"{'+' * (0 < pawn)}{pawn} centipawn pour les blancs.")
             else:
@@ -318,7 +318,7 @@ class Chess(Game):
 
             analyse = await self.engine.analyse(self.board, chess.engine.Limit(depth=15))
             score = analyse["score"].white() if self.bot.user == self.first_player else analyse["score"].black()
-            if type(score) == chess.engine.Mate and score.wdl().expectation() == 0:
+            if isinstance(score, chess.engine.Mate) and score.wdl().expectation() == 0:
                 await self.resigns()
                 return
             result = await self.engine.play(self.board, chess.engine.Limit(depth=15))
@@ -370,7 +370,7 @@ class Chess(Game):
                 await self.channel.send(
                     f"{ctx.author.name} à {'demander un' * self.draw[ctx.message.author]}{'annuler son' * cancel} nul.")
                 if self.draw[ctx.message.author] and not self.draw[self.bot.user]:
-                    await self.engine_accepte_draw()
+                    await self.engine_accept_draw()
             elif msg in generate_implicit(("non nul", "pas nul")):
                 self.draw = {player: False for player in self.players}
             elif first_arg in generate_implicit(("forfait", "abandon")):
@@ -393,7 +393,7 @@ class Chess(Game):
                 except ValueError:
                     await self.channel.send("Mouvement invalide.")
 
-    async def engine_accepte_draw(self):
+    async def engine_accept_draw(self):
         analyse = await self.engine.analyse(self.board, chess.engine.Limit(depth=15))
         score = analyse["score"].white().wdl().expectation()
         score = score if self.bot.user == self.first_player else 1 - score

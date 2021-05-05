@@ -55,7 +55,7 @@ def upload_image_on_imgur(*, url=None, file_path=""):
     return "https://i.imgur.com/" + rep[rep.find("link") + 33:rep.find(".png") + 4]  # return the link of the image
 
 
-def quit_function(fn_name):
+def quit_function():
     sys.stderr.flush()  # Python 3 stderr is likely buffered.
     _thread.interrupt_main()  # raises KeyboardInterrupt
 
@@ -67,7 +67,7 @@ def exit_after(s):
     """
     def outer(fn):
         def inner(*args, **kwargs):
-            timer = threading.Timer(s, quit_function, args=[fn.__name__])
+            timer = threading.Timer(s, quit_function)
             timer.start()
             try:
                 result = fn(*args, **kwargs)
