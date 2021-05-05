@@ -17,8 +17,9 @@ class Sheet:
     def __init__(self, sheet_id: str):
         scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets',
                  "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
-        exist = os.path.isfile(r"resource/credentials/gcreds.json")
-        if not exist:
+        with open(r"resource/credentials/gcreds.json", "r") as gcreds_file:
+            is_ok = gcreds_file.read() != ""
+        if not is_ok:
             with open(r"resource/credentials/gcreds.json", "w+") as gcreds_file:
                 gcreds_file.write(os.environ["gcreds"][:-1] + "," + os.environ["gcreds_private_key"] + "}")
         gcreds = ServiceAccountCredentials.from_json_keyfile_name("resource/credentials/gcreds.json", scope)
