@@ -1,10 +1,8 @@
 import random
 
 import discord
-from discord import HTTPException
 from discord.ext import commands
 from discord.ext.commands import Bot
-from sympy import SympifyError
 
 from python_script.activity import Activity
 from python_script.calculator import calculate
