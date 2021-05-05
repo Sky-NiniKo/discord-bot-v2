@@ -4,6 +4,7 @@ import discord
 from discord import HTTPException
 from discord.ext import commands
 from discord.ext.commands import Bot
+from sympy import SympifyError
 
 from python_script.activity import Activity
 from python_script.calculator import calculate
@@ -55,15 +56,10 @@ class Command(commands.Cog):
         try:
             result = calculate(content[content.find("=") + 1:])
             if result is True:
-                msg = await ctx.send(file=discord.File("resource/temp/plot.png"))
+                msg = await ctx.send(file=discord.File("resource/temp/result.png"))
             else:
-                try:
-                    msg = await ctx.send(result)
-                except HTTPException:
-                    with open("resource/temp/message.txt", "w+") as file:
-                        file.write(str(result))
-                    msg = await ctx.send(file=discord.File("resource/temp/message.txt"))
-        except (TypeError, ValueError):
+                msg = await ctx.send(result)
+        except (ValueError, SyntaxError, IndexError):
             msg = await ctx.send("Désoler mais je ne peux pas calculer ceci.")
         except KeyboardInterrupt:
             msg = await ctx.send("Votre calcule est trop compliquer, je ne peux pas le traiter.")
