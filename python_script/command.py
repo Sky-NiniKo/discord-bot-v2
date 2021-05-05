@@ -59,7 +59,7 @@ class Command(commands.Cog):
                 msg = await ctx.send(file=discord.File("resource/temp/result.png"))
             else:
                 msg = await ctx.send(result)
-        except (ValueError, SyntaxError, IndexError):
+        except (ValueError, SyntaxError, IndexError, NotImplementedError):
             msg = await ctx.send("Désoler mais je ne peux pas calculer ceci.")
         except KeyboardInterrupt:
             msg = await ctx.send("Votre calcule est trop compliquer, je ne peux pas le traiter.")
