@@ -73,7 +73,7 @@ def calculate(calculation: str, raw=False, plot_2d=False, plot_3d=False, equatio
         else:
             raw = True
     if ";" not in calculation:
-        if raw:
+        if raw or return_approx:
             return raw_calculate(calculation, return_str, return_approx)
         if plot_2d:
             graph(calculation)
