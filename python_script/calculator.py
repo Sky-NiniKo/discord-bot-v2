@@ -69,7 +69,7 @@ def calculate(calculation: str, raw=False, plot_2d=False, plot_3d=False, equatio
             calculation = calculation[6:]
         elif calculation.startswith("appr"):
             return_approx = True
-            calculation = calculation[6:]
+            calculation = calculation[5:]
         else:
             raw = True
     if ";" not in calculation:
