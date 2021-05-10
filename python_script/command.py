@@ -221,7 +221,7 @@ class Command(commands.Cog):
             msg = await ctx.author.send("**Besoin d'aide** sur une commande ? Faite `!? (commande)`"
                                         "\nTu veux affronter ton ami aux **puissance 4** alors fait "
                                         "`!puissance4 @(nom de ton ami)`"
-                                        "\nUne petite partie d'échecs ? Fait `!échecs @(nom de l'adversaire)"
+                                        "\nUne petite partie d'échecs ? Fait `!échecs @(nom de l'adversaire)`"
                                         "\nJe peux faire un **calcule** avec `=(calcule)`"
                                         "\nJe peux **nettoyer mes messages** avec `!clear (nombre de messages)`"
                                         "\nTu veux savoir le **ping** du bot alors fait `!ping`"

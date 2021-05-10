@@ -1,20 +1,22 @@
-import os
-import time
-import logging
-import platform
-
+import _thread
+import asyncio
 import configparser
-import discord
-from discord.ext import commands
+import logging
+import os
+import platform
+import time
+from datetime import datetime, timedelta
 
-from python_script.game import GameEngine
-from python_script.command import Command
+import discord
+from discord.ext import commands, tasks
+
 from python_script.activity import Activity
-from python_script.utils import set_client_id
-from python_script.sheet import AvatarHistory
+from python_script.command import Command
 from python_script.dictionary import Dictionary
-from python_script.everyday_task import EverydayTask
+from python_script.game import GameEngine
 from python_script.reaction import QuickDelete, reaction_add, reaction_remove
+from python_script.sheet import AvatarHistory
+from python_script.utils import set_client_id
 
 if platform.system() == "Windows":
     os.environ['PATH'] = r'resource/cairo/Windows' + ';' + os.environ['PATH']
@@ -51,7 +53,6 @@ quick_delete = QuickDelete(bot, sheet_m)
 game = GameEngine(bot, quick_delete)
 avatar_history = AvatarHistory(bot, sheet_a)
 activity = Activity(bot, sheet_e)
-everyday_task = EverydayTask(avatar_history, game, activity)
 command = Command(bot, quick_delete, game, avatar_history, sheet_s, activity)
 
 
@@ -67,9 +68,16 @@ async def on_ready():
     try:
         print("Initialisation des évenements.", end=" ")
         await activity.__init_events__()
-        print("Terminé\nInitialisation de Quick Delete\n\nLancement des tâches quotidiennes")
+        print("Terminé\nInitialisation de Quick Delete")
         bot.loop.create_task(quick_delete.__init_my_msgs__())
-        bot.loop.create_task(everyday_task.start())
+        print("Mise à jours des game_template et changement des activités\n")
+        await game.update_game_template()
+        await activity.change()
+
+        tomorrow = (datetime.now() + timedelta(days=1)).day
+        while datetime.now().day == tomorrow:
+            await asyncio.sleep(1)
+        everyday_task.start()
     except Exception as e:
         await send_error(e, Creator_ID, "Il y a eu une erreur après le on_ready")
 
@@ -113,6 +121,15 @@ async def on_raw_reaction_remove(payload):
         await reaction_remove(payload, bot)
     except Exception as e:
         await send_error(e, Creator_ID, "Il y a eu une erreur après que quelqu'un a enlever sa réaction")
+
+
+@tasks.loop(hours=24)
+async def everyday_task():
+    print("Mise à jours des game_template et changement des activités\n")
+    await game.update_game_template()
+    await activity.change()
+    print("Mise à jours de l'historique des avatars")
+    _thread.start_new_thread(avatar_history.update, ())
 
 
 # lancement du bot
