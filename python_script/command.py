@@ -30,9 +30,9 @@ class Command(commands.Cog):
                              "event_list": ("event", "event_list"), "pile_ou_face": ("pile_ou_face", "pf"),
                              "statistics_sheet": ("statistique", "stat")}
 
-    # --------------#
+    # ------------- #
     #    command    #
-    # --------------#
+    # ------------- #
 
     @commands.command(aliases=["+event"])
     async def add_event(self, ctx, date, event_type, *activity_name):
