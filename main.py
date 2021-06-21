@@ -80,6 +80,8 @@ async def on_ready():
         everyday_task.start()
     except Exception as e:
         await send_error(e, Creator_ID, "Il y a eu une erreur après le on_ready")
+        import traceback as tb
+        print(''.join(tb.format_exception(None, e, e.__traceback__)))
 
 
 @bot.event
@@ -102,6 +104,8 @@ async def on_message(message):
             await dictionary.search(ctx)
     except Exception as e:
         await send_error(e, Creator_ID, "Il y a eu une erreur sur un message")
+        import traceback as tb
+        print(''.join(tb.format_exception(None, e, e.__traceback__)))
 
 
 @bot.event
@@ -113,6 +117,8 @@ async def on_raw_reaction_add(payload):
             await reaction_add(payload, quick_delete, bot)
     except Exception as e:
         await send_error(e, Creator_ID, "Il y a eu une erreur après que quelqu'un a réagie")
+        import traceback as tb
+        print(''.join(tb.format_exception(None, e, e.__traceback__)))
 
 
 @bot.event
@@ -121,6 +127,8 @@ async def on_raw_reaction_remove(payload):
         await reaction_remove(payload, bot)
     except Exception as e:
         await send_error(e, Creator_ID, "Il y a eu une erreur après que quelqu'un a enlever sa réaction")
+        import traceback as tb
+        print(''.join(tb.format_exception(None, e, e.__traceback__)))
 
 
 @tasks.loop(hours=24)
