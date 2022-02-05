@@ -4,12 +4,12 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import Bot
 
-from python_script.activity import Activity
-from python_script.calculator import calculate
-from python_script.game import GameEngine
-from python_script.reaction import QuickDelete
-from python_script.sheet import AvatarHistory, Statistics
-from python_script.utils import is_in, values_from_one
+from .activity import Activity
+from .calculator import calculate
+from .game import GameEngine
+from .reaction import QuickDelete
+from .sheet import AvatarHistory, Statistics
+from .utils import is_in, values_from_one
 
 
 class Command(commands.Cog):
@@ -22,7 +22,7 @@ class Command(commands.Cog):
         self.statistics_sheet = Statistics(sheet_s)
         self.activity = activity
         self.command_list = {"?": ("help", "aide", "?"), "=": ("=", "calc"), "clear_all": ("clearA", "videA", "purgeA"),
-                             "clear": ("vide", "clear", "propre", "nettoyer", "purge"), "aliases": ("aliases",),
+                             "clear": ("vide", "clear", "propre", "nettoyer", "purge"), "aliases": ("aliases", "alias"),
                              "connect_4": ("puissance_4", "connect_4", "puissance4", "connect4"), "dice": ("dé", "de"),
                              "update_avatar": ("update_avatar", "update_sheet"), "ping": ("ping", "pg"),
                              "update_game_template": ("update_game_template", "update_modèle"), "code": ("code",),
@@ -38,7 +38,7 @@ class Command(commands.Cog):
     async def add_event(self, ctx, date, event_type, *activity_name):
         activity_name = " ".join(activity_name)
         self.activity.add(date, event_type, activity_name)
-        msg = await ctx.send("Votre événement a été correctement enregister")
+        msg = await ctx.send("Votre événement a été correctement enregistrer")
         await self.quick_delete.add([msg, ctx.message])
         self.statistics_sheet.add(str(ctx.author), "add_event")
 
@@ -54,14 +54,19 @@ class Command(commands.Cog):
         try:
             result = calculate(content[content.find("=") + 1:])
             if result is True:
-                msg = await ctx.send(file=discord.File("resource/temp/result.png"))
+                msgs = [await ctx.send(file=discord.File("resource/temp/result.png"))]
+            elif len(result) <= 10000:
+                msgs = []
+                for part in [result[index: index + 1974] for index in range(0, len(result), 1974)]:
+                    msgs.append(await ctx.send(part))
+                msgs.reverse()
             else:
-                msg = await ctx.send(result)
+                msgs = [await ctx.send(result)]
         except (ValueError, SyntaxError, IndexError, NotImplementedError):
-            msg = await ctx.send("Désoler mais je ne peux pas calculer ceci.")
+            msgs = [await ctx.send("Désoler mais je ne peux pas calculer ceci.")]
         except KeyboardInterrupt:
-            msg = await ctx.send("Votre calcule est trop compliquer, je ne peux pas le traiter.")
-        await self.quick_delete.add([msg, ctx.message])
+            msgs = [await ctx.send("Votre calcule est trop compliquer, je ne peux pas le traiter.")]
+        await self.quick_delete.add(msgs + [ctx.message])
         self.statistics_sheet.add(str(ctx.author), "calculate")
 
     @commands.command(aliases=["vide", "propre", "nettoyer", "purge"])
@@ -99,15 +104,14 @@ class Command(commands.Cog):
 
         msgs = []
         if answer <= 6:
-            msgs += [await ctx.send(file=discord.File(f"resource/assets/dice/{answer}.png"), delete_after=3600)]
-        msgs += [await ctx.send(f"Le dé est tombé sur {answer}")]
+            msgs.append(await ctx.send(file=discord.File(f"resource/assets/dice/{answer}.png"), delete_after=3600))
+        msgs.append(await ctx.send(f"Le dé est tombé sur {answer}"))
         await self.quick_delete.add(msgs + [ctx.message])
         self.statistics_sheet.add(str(ctx.author), "dice")
 
     @commands.command(aliases=["event"])
     async def event_list(self, ctx):
-        events = self.activity.get_event_list()
-        if events:  # si il y a des événements
+        if events := self.activity.get_event_list():
             msg = await ctx.send("\n".join(" ".join(x) for x in events))
         else:
             msg = await ctx.send("Il n'y a pas d'événement prévu")
@@ -137,7 +141,7 @@ class Command(commands.Cog):
     @commands.command(aliases=["update_sheet"])
     async def update_avatar(self, ctx):
         self.avatar_history.update()
-        msg = await ctx.send("L'histotique des avatars a été mis à jour.")
+        msg = await ctx.send("L'historique des avatars a été mis à jour.")
         await self.quick_delete.add([msg, ctx.message])
         self.statistics_sheet.add(str(ctx.author), "update_avatar")
 
@@ -148,7 +152,7 @@ class Command(commands.Cog):
         await self.quick_delete.add([msg, ctx.message])
         self.statistics_sheet.add(str(ctx.author), "update_game_template")
 
-    @commands.command(aliases=["aliase"])
+    @commands.command(aliases=["alias"])
     async def aliases(self, ctx, command_name):
         try:
             msg = await ctx.send(values_from_one(self.command_list, command_name))
@@ -205,7 +209,7 @@ class Command(commands.Cog):
                 msg = await ctx.send("Lance un pièce.\nC'est tout.")
             elif is_in(self.command_list["statistics_sheet"], args):
                 msg = await ctx.send("Donne le lien du Google Sheet avec les statistiques.\n"
-                                     "*Note: vous pouvez demender à ne plus apparaître "
+                                     "*Note: vous pouvez demander à ne plus apparaître "
                                      "dans les statistiques en contactant Sky NiniKo.*")
             elif is_in(self.command_list["connect_4"], args):
                 msg = await ctx.send("Permet de créé une partie de puissance 4.\n"
@@ -232,7 +236,7 @@ class Command(commands.Cog):
                                         "\nEnvie de **voir les autres manière d'écrire une commande** ? "
                                         "Fait `!aliases (commande)`"
                                         "\nPour **voir le code** fait `!code`"
-                                        "\nJe fait des statistique et par soucie de transparance, "
+                                        "\nJe fait des statistique et par soucie de transparence, "
                                         "tu peux **obtenir les statistiques** avec `!stat` car elles sont publique.")
         await self.quick_delete.add([msg, ctx.message])
         self.statistics_sheet.add(str(ctx.author), "aide")

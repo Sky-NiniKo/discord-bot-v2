@@ -11,8 +11,8 @@ import discord
 import requests
 from discord.ext.commands import Bot, Context
 
-from python_script.reaction import QuickDelete
-from python_script.utils import generate_implicit, multiple_replace
+from .reaction import QuickDelete
+from .utils import generate_implicit, multiple_replace
 
 english_pieces = ("K", "Q", "R", "B", "N")
 french_pieces = ("R", "D", "T", "F", "C")
@@ -94,12 +94,12 @@ class Connect4(Game):
         players_name = ", ".join(player.name for player in self.players[:-1]) + " et " + self.players[-1].name
         if self.is_bot:
             await self.channel.send(
-                f"Vous jouez avec {players_name}.\nBienvenue dans le puiussance 4.\n\nSi vous voulez commencer faite "
+                f"Vous jouez avec {players_name}.\nBienvenue dans le puissance 4.\n\nSi vous voulez commencer faite "
                 f"`start`\nSi vous voulez qu'un joueur en particulier commence faite `first @(joueur)`\n"
                 f"Si vous voulez personnaliser votre colour faite `emoji (emoji)`\n" + "\\_" * 50)
         else:
             await self.channel.send(
-                f"Vous jouez avec {players_name}.\nBienvenue dans le puiussance 4.\n\nSi vous voulez commencer faite "
+                f"Vous jouez avec {players_name}.\nBienvenue dans le puissance 4.\n\nSi vous voulez commencer faite "
                 f"`start`\nSi vous voulez changer la taille du puissance 4 faite `size (longueur)*(largeur)`\n"
                 f"Si vous voulez qu'un joueur en particulier commence faite `first @(joueur)`\n"
                 f"Si vous voulez faire plus qu'un puissance 4 par exemple un puissance 5 il faut faire `for_win 5`\n"
@@ -140,7 +140,7 @@ class Connect4(Game):
 
     async def insert(self, column, color):
         """Insert the color in the given column."""
-        self.replay += [str(column + 1)]
+        self.replay.append(str(column + 1))
 
         c = self.board[column]
 
@@ -162,7 +162,7 @@ class Connect4(Game):
             to_show += f"{self.players[self.player].name} à gagner !"
             await self.channel.send(to_show)
             await self.channel.send(":tada:")
-            await self.channel.send("Maintenant vous pouver quitter avec `quit`\n" + "\\_" * 50)
+            await self.channel.send("Maintenant vous pouvez quitter avec `quit`\n" + "\\_" * 50)
         return not w
 
     def get_winner(self):
@@ -205,7 +205,9 @@ class Connect4(Game):
                 await self.size(ctx.message.content.split()[1])
             elif first_arg in generate_implicit(("premier", "first")):
                 try:
-                    self.player = self.players.index((ctx.message.mentions[0])) - 1  # -1 car sa fait +1 dès le démarage
+                    self.player = self.players.index(
+                        (ctx.message.mentions[0])) - 1  # -1, car ça fait +1 dès le démarrage
+
                     if self.player == -1:
                         self.player = len(self.players) - 1
                         await self.channel.send(f"{self.players[0].name} commencera.")
@@ -218,7 +220,7 @@ class Connect4(Game):
                     arg = int(ctx.message.content.split()[1])
                     if self.cols >= arg or self.rows >= arg:
                         self.win = arg
-                        await self.channel.send(f"Il faudra maintenant alligné {arg} pièce pour gagner.")
+                        await self.channel.send(f"Il faudra maintenant aligné {arg} pièce pour gagner.")
                     else:
                         await self.channel.send("Ce nombre est trop grand pour la taille de ton puissance 4")
                 else:
@@ -233,7 +235,7 @@ class Chess(Game):
     def __init__(self, channel, ctx: Context, bot: Bot, quick_delete: QuickDelete, game_template):
         super(Chess, self).__init__(channel, ctx, bot, quick_delete, game_template, replay_separation="|")
         self.chess_games_number = sum(map(lambda value: isinstance(value, Chess),
-                                          self.game_template.values())) + 1  # Il ne se compte pas lui même donc +1 mais je ne suis pas sûr
+                                          self.game_template.values())) + 1  # Il ne se compte pas lui-même donc +1, mais je ne suis pas sûr
         if self.chess_games_number >= 256:
             raise BufferError("Too many game in same time this can cause performance issue")
         self.first_player = ""
@@ -247,8 +249,12 @@ class Chess(Game):
         self.transport = None
 
     async def info(self):
-        path = "resource/chess engines/"
-        path += "stockfish_13_win_x64.exe" if "Windows" in platform.platform() else "stockfish_13_linux_x64"
+        path = "resource/chess engines/" + (
+            "stockfish_13_win_x64.exe"
+            if "Windows" in platform.platform()
+            else "stockfish_13_linux_x64"
+        )
+
         self.transport, self.engine = await chess.engine.popen_uci(path)
 
         hash_size = round(256 / self.chess_games_number)
@@ -262,7 +268,7 @@ class Chess(Game):
             f"Vous jouez avec {players_name}.\nBienvenue dans le jeux d'échecs.\n\nSi vous voulez commencer faite "
             f"`start`\nSi vous voulez qu'un joueur en particulier commence faite `first @(joueur)`\n"
             f"Si vous voulez avoir un indication sur les chances que quelqu'un gagne faite `chance`\n\n"
-            f"Pour déplacer les pièces écriver un movement en Notation algébrique abrégée française, anglaise ou "
+            f"Pour déplacer les pièces écrivez un movement en Notation algébrique abrégée française, anglaise ou "
             f"figurine (<https://fr.wikipedia.org/wiki/Notation_algébrique#Notation_algébrique_abrégée>) "
             f"ou en écrivant simplement les cases. Exemple : e2e4\n{''.join(unicode_white_pieces)}\n" + "\\_" * 50)
 
@@ -299,21 +305,21 @@ class Chess(Game):
             score = analyse["score"].white()
             if isinstance(score, chess.engine.Cp):
                 pawn = int(str(score)) / 100
-                await self.channel.send(f"{'+' * (0 < pawn)}{pawn} centipawn pour les blancs.")
+                await self.channel.send(f'{"+" * (pawn > 0)}{pawn} centipawn pour les blancs.')
             else:
                 mate = score.mate()
                 color = "blancs" if mate > 0 else "noirs"
                 await self.channel.send(f"Mate en {abs(mate)} coups pour les {color}.")
 
         if self.players[self.player] == self.bot.user:
-            reponse = requests.get(
+            response = requests.get(
                 f"https://tablebase.lichess.ovh/standard?fen={self.board.fen()}")  # permet de conclure en fin de partie
-            reponse = json.loads(str(reponse.content, encoding=reponse.apparent_encoding))
-            if any((reponse['wdl'], reponse['dtz'], reponse['dtm'])):
-                if any(map(lambda x: x < 0, (reponse['wdl'], reponse['dtz'], reponse['dtm']))):
+            response = json.loads(str(response.content, encoding=response.apparent_encoding))
+            if any((response['wdl'], response['dtz'], response['dtm'])):
+                if any(map(lambda x: x < 0, (response['wdl'], response['dtz'], response['dtm']))):
                     await self.resigns()
                     return
-                move = self.board.parse_uci(reponse['moves'][0]['uci'])
+                move = self.board.parse_uci(response['moves'][0]['uci'])
                 await self.verify(move)
 
             analyse = await self.engine.analyse(self.board, chess.engine.Limit(depth=15))
@@ -326,7 +332,7 @@ class Chess(Game):
             await self.verify(result.move)
 
     async def verify(self, move: chess.Move):
-        self.replay += [str(move)]
+        self.replay.append(str(move))
         self.last_move = move
         if not self.board.is_game_over():
             await self.end_turn()

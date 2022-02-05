@@ -4,10 +4,10 @@ from datetime import date, timedelta, datetime
 import discord
 from discord.ext.commands import Bot
 
-from python_script.sheet import EventsDate
+from .sheet import EventsDate
 
 
-def easter_date(year=date.today().year):
+def easter_date(year=date.today().year) -> date:
     # Calcule le jour de la fête de pâques
     a = year % 19
     b = year // 100
@@ -28,13 +28,13 @@ class Activity:
         self.activities = [("joue", "tourner en rond"), ("joue", "faire ses devoirs"), ("regarde", "des animées"),
                            ("joue", "pile ou face"), ("joue", "dire n'importe quoi"), ("joue", "faire une omelette"),
                            ("écoute", "de la musique"), ("joue", "lancer des dés"), ("joue", "faire des top 1"),
-                           ("joue", "se questionner sur son existance"), ("regarde", "YouTube"),
+                           ("joue", "se questionner sur son existence"), ("regarde", "YouTube"),
                            ("joue", "énerver des gens"),
                            ("joue", "faire des choses pas très catholique (mais il est athée)"),
                            ("joue", "faire des gâteaux"), ("joue", "envoyer des message"),
                            ("joue", "la machine à café"), ("joue", "au frigo"),
                            ("joue", "jjjoue à jjjouùe à jjjoùée à jjjouùée àa"), ("joue", "cube cube"),
-                           ("regarde", "les étoiles"), ("regarde", "le ciel"), ("écoute", "[inserer musique]"),
+                           ("regarde", "les étoiles"), ("regarde", "le ciel"), ("écoute", "[insérer musique]"),
                            ("joue", "avec un sombrero"), ("regarde", "les fautes de français des gens pas doués")]
 
     async def __init_events__(self):
@@ -79,7 +79,7 @@ class Activity:
             event_type, activity_name = random.choice(self.activities)  # activité aléatoire
             await self.change_to(event_type, activity_name)
 
-    def get_event_list(self):
+    def get_event_list(self) -> list:
         dates = list(self.events.keys())
-        dates.sort(key=lambda event_date: datetime.strptime(date, "%Y-%m-%d"))
+        dates.sort(key=lambda event_date: datetime.strptime(event_date, "%Y-%m-%d"))
         return [[one_date] + self.events[one_date] for one_date in dates]

@@ -9,7 +9,7 @@ sheet = None
 
 
 def is_in(elements, content: iter):
-    return any(element in content for element in elements)  # renvoir True si un element est dans content
+    return any(element in content for element in elements)  # renvoie True si un element est dans content
 
 
 def values_from_one(dictionary: dict, value):
@@ -38,7 +38,7 @@ def set_client_id(client_id):
 
 
 def upload_image_on_imgur(*, url=None, file_path=""):
-    global Client_ID
+    # global Client_ID
     if Client_ID is None:
         raise ValueError("Client_ID doesn't set")
     if not file_path and not url or file_path and url:
@@ -48,11 +48,9 @@ def upload_image_on_imgur(*, url=None, file_path=""):
     else:
         with open(file_path, "rb") as file:
             payload = {'image': file.read()}
-    api = "https://api.imgur.com/3/image"
     headers = {'Authorization': f'Client-ID {Client_ID}'}
-    response = requests.request("POST", api, headers=headers, data=payload, files=[])  # upload image
-    rep = str(response.text.encode('utf-8')[2:-1])  # convert response in string
-    return "https://i.imgur.com/" + rep[rep.find("link") + 33:rep.find(".png") + 4]  # return the link of the image
+    response = requests.post("https://api.imgur.com/3/image", headers=headers, data=payload)  # upload image
+    return response.json()["data"]["link"]  # return the link of the image
 
 
 def quit_function():
@@ -62,7 +60,7 @@ def quit_function():
 
 def exit_after(s):
     """
-    use as decorator to exit process if
+    Use as decorator to exit process if
     function takes longer than s seconds
     """
     def outer(fn):

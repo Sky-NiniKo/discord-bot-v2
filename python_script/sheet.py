@@ -5,7 +5,7 @@ from discord import Asset, NotFound
 from discord.ext.commands import Bot
 from oauth2client.service_account import ServiceAccountCredentials
 
-from python_script.utils import upload_image_on_imgur
+from .utils import upload_image_on_imgur
 
 
 # noinspection PyProtectedMember
@@ -37,7 +37,7 @@ class AvatarHistory(Sheet):
         nothing_row = []
         for num, row in enumerate(self.sheet.col_values(1)):
             if row == "":
-                nothing_row += [num - len(nothing_row) + 1]
+                nothing_row.append(num - len(nothing_row) + 1)
         for row in nothing_row:
             self.sheet.delete_row(row)
 
@@ -53,7 +53,7 @@ class AvatarHistory(Sheet):
                 user_names = self.sheet.cell(user_row, 2).value
 
                 if str(user) not in user_names.split(" + "):  # si le nom a changé
-                    self.sheet.update_cell(user_row, 2, f"{user_names} + {str(user)}")  # mettre le nouveau nom
+                    self.sheet.update_cell(user_row, 2, f"{user_names} + {user}")  # mettre le nouveau nom
 
                 if avatar_url(user) != self.sheet.cell(user_row, 3).value:  # si l'avatar a changé
                     self.sheet.update_cell(user_row, len(self.sheet.row_values(user_row)) + 1,
@@ -93,16 +93,16 @@ class SaveMsgs(Sheet):
                 self.sheet.delete_row(row_number - delete_row)
                 delete_row += 1
                 continue
-            channel = await self.bot.fetch_channel(row[0])
+            channel = await self.bot.get_channel(row[0])
             msgs = []
             error = False
-            for ID in row[1:]:  # tout sauf le premier car c'est l'ID du channel
+            for ID in row[1:]:  # tout sauf le premier, car c'est l'ID du channel
                 if ID == "To Delete":
                     error = True
                     continue
                 try:
                     if ID:
-                        msgs += [await channel.fetch_message(ID)]
+                        msgs.append(await channel.fetch_message(ID))
                 except NotFound:
                     error = True
             if error:
@@ -112,7 +112,7 @@ class SaveMsgs(Sheet):
                     if str(msgs[0].channel.type) != "private" or msg.author == self.bot.user:
                         await msg.delete()
             else:
-                values += [msgs]
+                values.append(msgs)
         return {element[0].id: element for element in values if element}
 
 

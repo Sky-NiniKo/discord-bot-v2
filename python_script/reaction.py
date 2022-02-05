@@ -2,7 +2,7 @@ import asyncio
 
 from discord.utils import get
 
-from python_script.sheet import SaveMsgs
+from .sheet import SaveMsgs
 
 
 class QuickDelete:
@@ -28,7 +28,7 @@ class QuickDelete:
         self.save.add(msgs)
 
     async def delete(self, payload):
-        message_id = payload.message_id  # recuperer le numéro du message
+        message_id = payload.message_id  # récupérer le numéro du message
         await self.wait_for_ok()
 
         if message_id in self.my_msg:
@@ -46,9 +46,9 @@ class QuickDelete:
 
 
 async def reaction_add(payload, quick_delete, bot):
-    emoji = payload.emoji.name  # recuperer l'emoji
-    canal = payload.channel_id  # recuperer le numero du canal
-    message_id = payload.message_id  # recuperer le numero du message
+    emoji = payload.emoji.name  # récupérer l'émoji
+    canal = payload.channel_id  # récupérer le numéro du canal
+    message_id = payload.message_id  # récupérer le numéro du message
 
     if emoji == "🗑️" and payload.user_id != bot.user.id:
         await quick_delete.delete(payload)
@@ -60,9 +60,9 @@ async def reaction_add(payload, quick_delete, bot):
 
 
 async def reaction_remove(payload, bot):
-    emoji = payload.emoji.name  # recuperer l'emoji
-    canal = payload.channel_id  # recuperer le numero du canal
-    message_id = payload.message_id  # recuperer le numero du message
+    emoji = payload.emoji.name  # récupérer l'émoji
+    canal = payload.channel_id  # récupérer le numéro du canal
+    message_id = payload.message_id  # récupérer le numéro du message
 
     if canal == 718396837442355240 and message_id == 722054829907640351 and emoji == "😎":
         partisans_animees_role = get(bot.get_guild(payload.guild_id).roles, name="Partisans des animées")

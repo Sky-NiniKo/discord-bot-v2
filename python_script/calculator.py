@@ -4,7 +4,7 @@ import requests
 from sympy import sympify, symbols, plot, pretty, SympifyError, latex, solveset, Eq, simplify, zoo
 from sympy.plotting import plot3d
 
-from python_script.utils import exit_after
+from .utils import exit_after
 
 
 result_file = "resource/temp/result.png"
@@ -20,7 +20,7 @@ def latex_need(c):
         return True
 
 
-def drange(x, y, jump):
+def decimal_range(x, y, jump):
     x, jump = Decimal(x), Decimal(jump)
     while x <= y:
         yield round(float(x), 15)
@@ -82,7 +82,7 @@ def calculate(calculation: str, raw=False, plot_2d=False, plot_3d=False, equatio
             graph3d(calculation)
             return True
         if equation_solve:
-            right, left = map(sympify, calculation.split("=")[0:2])
+            right, left = map(sympify, calculation.split("=")[:2])
             solution = solveset(Eq(right, left))
             if latex_need(solution) and not return_str:
                 with open(result_file, "wb") as file:
@@ -90,9 +90,9 @@ def calculate(calculation: str, raw=False, plot_2d=False, plot_3d=False, equatio
                 return True
             return pretty(solution)
     calculation = calculation.split(";")
-    start, value, stop = calculation[1].split("<")[0:3]
+    start, value, stop = calculation[1].split("<")[:3]
     if ',' in stop:
-        stop, step = stop.split(",")[0:2]
+        stop, step = stop.split(",")[:2]
     else:
         step = "1"
     start, stop, step = float(sympify(start)), float(sympify(stop)), float(sympify(step))
@@ -102,7 +102,7 @@ def calculate(calculation: str, raw=False, plot_2d=False, plot_3d=False, equatio
     if abs((stop - start) / step) <= 30:
         return "\n".join(
             f"{value}={x}; " + str(float(sympify(calculation[0]).subs(symbols(value), x)))
-            for x in drange(start, stop, step)
+            for x in decimal_range(start, stop, step)
         )
     raise NotImplementedError
 
@@ -115,4 +115,4 @@ if __name__ == '__main__':
 
         os.environ['PATH'] = r'../resource/cairo/Windows' + ';' + os.environ['PATH']
     result_file = "../" + result_file
-    print((calculate(input())))
+    print((calculate(input(), return_str=True)))
