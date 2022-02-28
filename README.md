@@ -7,22 +7,20 @@
 # Run at home (only Windows and Linux are supported)
 First install all python dependencies of Pipfile.lock and if you are on Linux install all packages in Aptfile with apt.
 
-In the `resource` folder open `credentials` folder and put 2 files in it, `creds.ini` and `gcreds.json` that you get from this tutorial https://www.youtube.com/watch?v=cnPlKLEGR7E&t=32s.
-## creds.ini
-Fill creds.ini like this (the information with an * are essential to start the program and the one with a ¤ are essential to have all the functionalities of the bot and not to have any error)
+In the `resource` folder open `credentials` folder and put 2 files in it, `.env` and `gcreds.json` that you get from this tutorial https://www.youtube.com/watch?v=cnPlKLEGR7E&t=32s.
+## .env
+Fill .env like this (the information with an * are essential to start the program and the one with a ¤ are essential to have all the functionalities of the bot and not to have any error)
 ```ini
 [Discord Bot]
-TOKEN = <*Your discord bot token>
-Creator_ID = <Your discord account ID>
+DISCORD_BOT_TOKEN = <*Your discord bot token>
+OWNER = <Your discord account ID>
 
-[Imgur]
-Client_ID = <¤Imgur API: CLIENT_ID>
+IMGUR_CLIENT_ID = <¤Imgur API: CLIENT_ID>
 
-[Google Sheet]
-Avatar_history = <*Google Sheet ID>
-Save_msgs = <*Google Sheet ID>
-Statistics = <*Google Sheet ID>
-Event_date = <*Google Sheet ID>
+SHEET_AVATAR_HISTORY = <*Google Sheet ID>
+SHEET_SAVE_MSGS = <*Google Sheet ID>
+SHEET_STATISTICS = <*Google Sheet ID>
+SHEET_EVENT_DATE = <*Google Sheet ID>
 ```
 Where to find this information?
 

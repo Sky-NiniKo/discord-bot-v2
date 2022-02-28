@@ -6,7 +6,6 @@ from sympy.plotting import plot3d
 
 from .utils import exit_after
 
-
 result_file = "resource/temp/result.png"
 
 
@@ -50,13 +49,15 @@ def raw_calculate(calculation, return_str=False, return_approx=False):
     if latex_need(ret) and not return_str:
         latex_str = latex(ret) if approximation is None else latex(ret) + r"\approx" + str(approximation)
         with open(result_file, "wb") as file:
-            file.write(requests.get(f"https://latex.codecogs.com/png.download?{latex_str}").content)
+            file.write(requests.get(
+                r"https://latex.codecogs.com/png.download?\dpi{110}%20\fn_phv%20\huge%20{\color{White}" + latex_str + "}").content)
         return True
     return pretty(ret) if approximation is None else pretty(ret) + " ≈ " + str(approximation)
 
 
 @exit_after(10)
-def calculate(calculation: str, raw=False, plot_2d=False, plot_3d=False, equation_solve=False, return_str=False, return_approx=False):
+def calculate(calculation: str, raw=False, plot_2d=False, plot_3d=False, equation_solve=False, return_str=False,
+              return_approx=False):
     if not raw:  # regarde si il n'y a pas un argument
         if calculation.startswith("solve"):
             equation_solve = True

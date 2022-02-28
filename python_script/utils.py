@@ -38,7 +38,6 @@ def set_client_id(client_id):
 
 
 def upload_image_on_imgur(*, url=None, file_path=""):
-    # global Client_ID
     if Client_ID is None:
         raise ValueError("Client_ID doesn't set")
     if not file_path and not url or file_path and url:

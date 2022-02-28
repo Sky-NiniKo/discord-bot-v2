@@ -250,9 +250,9 @@ class Chess(Game):
 
     async def info(self):
         path = "resource/chess engines/" + (
-            "stockfish_13_win_x64.exe"
+            "stockfish_14.1_win_x64.exe"
             if "Windows" in platform.platform()
-            else "stockfish_13_linux_x64"
+            else "stockfish_14.1_linux_x64"
         )
 
         self.transport, self.engine = await chess.engine.popen_uci(path)

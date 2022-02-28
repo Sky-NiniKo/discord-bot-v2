@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import configparser
 import discord
 from discord.ext import commands, tasks
+from dotenv import load_dotenv
 
 from python_script.activity import Activity
 from python_script.command import Command
@@ -23,35 +24,29 @@ if platform.system() == "Windows":
 logger = logging.getLogger(__name__)
 start = time.time()
 
-# importation/définition des identifiants
-if os.path.isfile(r"resource/credentials/creds.ini"):
-    creds = configparser.ConfigParser()
-    creds.read("resource/credentials/creds.ini")
-    TOKEN = creds.get("Discord Bot", "TOKEN")
-    Creator_ID = int(creds.get("Discord Bot", "Creator_ID"))
-    Client_ID = creds.get("Imgur", "Client_ID")
-    set_client_id(Client_ID)
-    sheet_a = creds.get("Google Sheet", "Avatar_history")
-    sheet_m = creds.get("Google Sheet", "Save_msgs")
-    sheet_s = creds.get("Google Sheet", "Statistics")
-    sheet_e = creds.get("Google Sheet", "Event_date")
-else:
-    TOKEN = os.environ["Discord_Bot_TOKEN"]
-    Creator_ID = int(os.environ["Discord_Bot_Creator_ID"])
-    Client_ID = os.environ["Imgur_Client_ID"]
-    set_client_id(Client_ID)
-    sheet_a = os.environ["Google_Sheet_Avatar"]
-    sheet_m = os.environ["Google_Sheet_Save_msgs"]
-    sheet_s = os.environ["Google_Sheet_Statistics"]
-    sheet_e = os.environ["Google_Sheet_Event"]
+load_dotenv()
 
-# définition des class
+# importation/définition des identifiants
+DISCORD_BOT_TOKEN = os.environ["DISCORD_BOT_TOKEN"]
+OWNER = int(os.environ["OWNER"])
+IMGUR_CLIENT_ID = os.environ["IMGUR_CLIENT_ID"]
+set_client_id(IMGUR_CLIENT_ID)
+sheet_a = os.environ["SHEET_AVATAR_HISTORY"]
+sheet_m = os.environ["SHEET_SAVE_MSGS"]
+sheet_s = os.environ["SHEET_STATISTICS"]
+sheet_e = os.environ["SHEET_EVENT_DATE"]
+
+# définition des classes
 bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
 quick_delete = QuickDelete(bot, sheet_m)
 game = GameEngine(bot, quick_delete)
 avatar_history = AvatarHistory(bot, sheet_a)
 activity = Activity(bot, sheet_e)
 command = Command(bot, quick_delete, game, avatar_history, sheet_s, activity)
+
+
+if OWNER:
+    bot.owner_id = OWNER
 
 
 async def send_error(exception, user_id, message):
@@ -77,7 +72,7 @@ async def on_ready():
             await asyncio.sleep(1)
         everyday_task.start()
     except Exception as e:
-        await send_error(e, Creator_ID, "Il y a eu une erreur après le on_ready")
+        await send_error(e, bot.owner_id, "Il y a eu une erreur après le on_ready")
         import traceback as tb
         print(''.join(tb.format_exception(None, e, e.__traceback__)))
 
@@ -99,7 +94,7 @@ async def on_message(message):
         elif message.content.startswith(bot.command_prefix):
             await bot.process_commands(message)
     except Exception as e:
-        await send_error(e, Creator_ID, "Il y a eu une erreur sur un message")
+        await send_error(e, bot.owner_id, "Il y a eu une erreur sur un message")
         import traceback as tb
         print(''.join(tb.format_exception(None, e, e.__traceback__)))
 
@@ -112,7 +107,7 @@ async def on_raw_reaction_add(payload):
         else:
             await reaction_add(payload, quick_delete, bot)
     except Exception as e:
-        await send_error(e, Creator_ID, "Il y a eu une erreur après que quelqu'un a réagit")
+        await send_error(e, bot.owner_id, "Il y a eu une erreur après que quelqu'un a réagit")
         import traceback as tb
         print(''.join(tb.format_exception(None, e, e.__traceback__)))
 
@@ -122,7 +117,7 @@ async def on_raw_reaction_remove(payload):
     try:
         await reaction_remove(payload, bot)
     except Exception as e:
-        await send_error(e, Creator_ID, "Il y a eu une erreur après que quelqu'un a enlever sa réaction")
+        await send_error(e, bot.owner_id, "Il y a eu une erreur après que quelqu'un a enlever sa réaction")
         import traceback as tb
         print(''.join(tb.format_exception(None, e, e.__traceback__)))
 
@@ -140,4 +135,4 @@ async def everyday_task():
 bot.add_cog(command)
 chrono = time.time()
 print(f"Lancement du bot après {round(time.time() - start, 3)}s")
-bot.run(TOKEN)
+bot.run(DISCORD_BOT_TOKEN)
