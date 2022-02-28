@@ -87,7 +87,8 @@ def calculate(calculation: str, raw=False, plot_2d=False, plot_3d=False, equatio
             solution = solveset(Eq(right, left))
             if latex_need(solution) and not return_str:
                 with open(result_file, "wb") as file:
-                    file.write(requests.get(f"https://latex.codecogs.com/png.download?{latex(solution)}").content)
+                    file.write(requests.get(
+                        r"https://latex.codecogs.com/png.download?\dpi{110}%20\fn_phv%20\huge%20{\color{White}" + latex(solution) + "}").content)
                 return True
             return pretty(solution)
     calculation = calculation.split(";")
