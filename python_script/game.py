@@ -462,7 +462,7 @@ class GameEngine:
                            "le bot ne peut pas lancer d'autre partie pour des raisons de performance")
 
     async def reaction(self, payload):
-        channel = self.bot.get_channel(payload.channel_id)
+        channel = await self.bot.fetch_channel(payload.channel_id)
         await self.games[channel].reaction(payload)
 
     async def message(self, ctx: Context):

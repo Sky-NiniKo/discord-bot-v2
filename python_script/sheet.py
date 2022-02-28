@@ -93,7 +93,7 @@ class SaveMsgs(Sheet):
                 self.sheet.delete_row(row_number - delete_row)
                 delete_row += 1
                 continue
-            channel = await self.bot.get_channel(row[0])
+            channel = await self.bot.fetch_channel(row[0])
             msgs = []
             error = False
             for ID in row[1:]:  # tout sauf le premier, car c'est l'ID du channel
