@@ -52,7 +52,11 @@ def raw_calculate(calculation, return_str=False, return_approx=False):
             file.write(requests.get(
                 r"https://latex.codecogs.com/png.download?\dpi{110}%20\fn_phv%20\huge%20{\color{White}" + latex_str + "}").content)
         return True
-    return pretty(ret) if approximation is None else pretty(ret) + " ≈ " + str(approximation)
+    return (
+        pretty(ret)
+        if approximation is None
+        else f'{pretty(ret)} ≈ {str(approximation)}'
+    )
 
 
 @exit_after(10)

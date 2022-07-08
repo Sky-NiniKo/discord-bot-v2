@@ -35,9 +35,8 @@ class AvatarHistory(Sheet):
 
     def update(self):
         nothing_row = []
-        for num, row in enumerate(self.sheet.col_values(1)):
-            if row == "":
-                nothing_row.append(num - len(nothing_row) + 1)
+        nothing_row.extend(num - len(nothing_row) + 1 for num, row in enumerate(self.sheet.col_values(1)) if row == "")
+
         for row in nothing_row:
             self.sheet.delete_row(row)
 

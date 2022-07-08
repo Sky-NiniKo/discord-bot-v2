@@ -87,7 +87,7 @@ class Connect4(Game):
         self.board = [[self.NONE] * rows for _ in range(cols)]
         self.win = required_to_win
         self.player = -1
-        self.numbers = tuple(str(x) + "⃣" for x in range(1, 10))
+        self.numbers = tuple(f'{str(x)}⃣' for x in range(1, 10))
         self.last_msg = None
 
     async def info(self):
@@ -429,7 +429,7 @@ class GameEngine:
 
         for guild in self.bot.guilds:
             for channel in guild.channels:
-                if str(channel) in ("template", "game", "games", "modèle"):
+                if str(channel) in {"template", "game", "games", "modèle"}:
                     self.game_template[guild] = channel
                 if first_start and "game-" in str(channel):
                     await channel.delete()

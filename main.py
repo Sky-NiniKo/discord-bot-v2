@@ -4,9 +4,8 @@ import logging
 import os
 import platform
 import time
-from datetime import datetime, timedelta
+from datetime import timedelta, date
 
-import configparser
 import discord
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
@@ -45,10 +44,6 @@ activity = Activity(bot, sheet_e)
 command = Command(bot, quick_delete, game, avatar_history, sheet_s, activity)
 
 
-if OWNER:
-    bot.owner_id = OWNER
-
-
 async def send_error(exception, user_id, message):
     logger.exception(exception)
     user = await bot.get_user(user_id)
@@ -58,6 +53,10 @@ async def send_error(exception, user_id, message):
 @bot.event
 async def on_ready():
     print(f"Bot prêt en {round(time.time() - chrono, 3)}s\nTotal : {round(time.time() - start, 3)}s\n")
+
+    if OWNER:
+        bot.owner_id = OWNER
+
     try:
         print("Initialisation des événements.", end=" ")
         await activity.__init_events__()
@@ -67,8 +66,8 @@ async def on_ready():
         await game.update_game_template()
         await activity.change()
 
-        tomorrow = (datetime.now() + timedelta(days=1)).day
-        while datetime.now().day == tomorrow:
+        tomorrow = (date.today() + timedelta(days=1)).day
+        while date.today().day == tomorrow:
             await asyncio.sleep(1)
         everyday_task.start()
     except Exception as e:
