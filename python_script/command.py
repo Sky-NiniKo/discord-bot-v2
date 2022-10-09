@@ -3,6 +3,7 @@ import random
 import discord
 from discord.ext import commands
 from discord.ext.commands import Bot
+from chempy import balance_stoichiometry
 
 from .activity import Activity
 from .calculator import calculate
@@ -47,6 +48,22 @@ class Command(commands.Cog):
         msg = await ctx.send("https://docs.google.com/spreadsheets/d/18yuov4obW1oIdaOO-SUivX_owepN6op-Nte8Vz-m4fQ/")
         await self.quick_delete.add([msg, ctx.message])
         self.statistics_sheet.add(str(ctx.author), "avatar")
+
+    @commands.command(aliases=["equilibrer"])
+    async def balancing(self, ctx, *equation):
+        equation = " ".join(equation)
+        if "=" in equation:
+            reactif, produit = equation.split("=")
+        else:
+            reactif, produit = equation.split("->")
+        if not produit:
+            msg = await ctx.send("Votre équation n'est pas valide")
+        else:
+            reac, prod = balance_stoichiometry(set(reactif.split("+")), set(produit.split("+")))
+            msg = await ctx.send(' + '.join(f"{num}{el}" for el, num in reac.items()) + " -> " + ' + '.join(f"{num}{el}" for el, num in prod.items()))
+        await self.quick_delete.add([msg, ctx.message])
+        self.statistics_sheet.add(str(ctx.author), "balancing")
+            
 
     @commands.command(aliases=["=", "calc"])
     async def calculate(self, ctx):

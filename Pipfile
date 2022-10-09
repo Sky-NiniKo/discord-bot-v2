@@ -29,6 +29,7 @@ oauthlib = "==3.2.0"
 setuptools = "==60.6.0"
 js2py = "*"
 python-dotenv = "*"
+chempy = "*"
 
 [dev-packages]
 

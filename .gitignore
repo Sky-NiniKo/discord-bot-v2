@@ -89,4 +89,4 @@ dmypy.json
 .idea/
 
 # Credentials
-resource/credentials/
+resource/credentials/*

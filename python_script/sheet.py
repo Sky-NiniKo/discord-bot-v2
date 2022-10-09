@@ -8,7 +8,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from .utils import upload_image_on_imgur
 
 
-# noinspection PyProtectedMember
+# decpreted
 def avatar_url(user):
     return str(Asset._from_avatar(user._state, user, static_format="png", size=4096))
 

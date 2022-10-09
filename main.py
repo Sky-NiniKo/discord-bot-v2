@@ -52,6 +52,7 @@ async def send_error(exception, user_id, message):
 
 @bot.event
 async def on_ready():
+    await bot.add_cog(command)
     print(f"Bot prêt en {round(time.time() - chrono, 3)}s\nTotal : {round(time.time() - start, 3)}s\n")
 
     if OWNER:
@@ -131,7 +132,6 @@ async def everyday_task():
 
 
 # lancement du bot
-bot.add_cog(command)
 chrono = time.time()
 print(f"Lancement du bot après {round(time.time() - start, 3)}s")
 bot.run(DISCORD_BOT_TOKEN)
