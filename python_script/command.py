@@ -60,7 +60,7 @@ class Command(commands.Cog):
             msg = await ctx.send("Votre équation n'est pas valide")
         else:
             reac, prod = balance_stoichiometry(set(reactif.split("+")), set(produit.split("+")))
-            msg = await ctx.send(' + '.join(f"{num}{el}" for el, num in reac.items()) + " -> " + ' + '.join(f"{num}{el}" for el, num in prod.items()))
+            msg = await ctx.send(' + '.join(f"{num}{el.strip()}" for el, num in reac.items()) + " -> " + ' + '.join(f"{num}{el.strip()}" for el, num in prod.items()))
         await self.quick_delete.add([msg, ctx.message])
         self.statistics_sheet.add(str(ctx.author), "balancing")
             
