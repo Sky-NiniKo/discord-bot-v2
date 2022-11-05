@@ -4,7 +4,6 @@ import logging
 import os
 import platform
 import time
-from datetime import timedelta, date
 
 import discord
 from discord.ext import commands, tasks

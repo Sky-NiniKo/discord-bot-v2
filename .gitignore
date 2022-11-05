@@ -89,4 +89,4 @@ dmypy.json
 .idea/
 
 # Credentials
-resource/credentials/*
+discord_bot_v2/resource/credentials/*

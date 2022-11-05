@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "discord-bot-v2"
+version = "5.6.10"
+description = ""
+authors = ["Sky NiniKo <pcninik@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "discord_bot_v2"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+CairoSVG = "^2.5.2"
+discord = "^2.0.0"
+gspread = "^5.6.2"
+requests = "^2.28.1"
+chess = "^1.9.3"
+python-dotenv = "^0.21.0"
+chempy = "^0.8.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
