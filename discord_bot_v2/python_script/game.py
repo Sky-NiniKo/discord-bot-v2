@@ -252,14 +252,14 @@ class Chess(Game):
 
     async def info(self):
         path = self.path / "resource/chess engines/" / (
-            "stockfish_14.1_win_x64.exe"
+            "stockfish_15_x64_popcnt.exe"
             if "Windows" in platform.platform()
-            else "stockfish_14.1_linux_x64"
+            else "stockfish_15_x64_popcnt"
         )
 
         self.transport, self.engine = await chess.engine.popen_uci(path.as_posix())
 
-        hash_size = round(256 / self.chess_games_number)
+        hash_size = 256 // self.chess_games_number
         for game in self.game_template.values():
             if isinstance(game, Chess):
                 await game.update_hash(hash_size)
