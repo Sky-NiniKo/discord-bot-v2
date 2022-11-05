@@ -10,12 +10,12 @@ from .utils import upload_image_on_imgur
 
 class Sheet:
     def __init__(self, sheet_id: str):
-        with open(r"discord_bot_v2/resource/credentials/gcreds.json", "r") as gcreds_file:
+        with open(r"resource/credentials/gcreds.json", "r") as gcreds_file:
             is_ok = gcreds_file.read() != ""
         if not is_ok:
-            with open(r"discord_bot_v2/resource/credentials/gcreds.json", "w+") as gcreds_file:
+            with open(r"resource/credentials/gcreds.json", "w+") as gcreds_file:
                 gcreds_file.write(os.environ["gcreds"][:-1] + "," + os.environ["gcreds_private_key"] + "}")
-        client = gspread.service_account(filename="discord_bot_v2/resource/credentials/gcreds.json")
+        client = gspread.service_account(filename="resource/credentials/gcreds.json")
 
         # TODO: Use name instead of ID
         self.sheet = client.open_by_key(sheet_id).worksheets()[0]
