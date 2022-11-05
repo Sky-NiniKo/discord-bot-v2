@@ -140,7 +140,7 @@ class Command(commands.Cog):
     @commands.command(aliase=["pf"])
     async def pile_ou_face(self, ctx):
         answer = "Pile" if random.random() < 0.5 else "Face"
-        msg2 = await ctx.send(file=discord.File(f"resource/assets/pièce/{answer.lower()}.png"), delete_after=3600)
+        msg2 = await ctx.send(file=discord.File(f"resource/assets/piece/{answer.lower()}.png"), delete_after=3600)
         msg = await ctx.send(answer)
         await self.quick_delete.add([msg, msg2, ctx.message])
         self.statistics_sheet.add(str(ctx.author), "pile_ou_face")
