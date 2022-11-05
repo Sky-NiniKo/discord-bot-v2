@@ -1,5 +1,5 @@
 [phases.setup]
-aptPkgs = ["..."]
+aptPkgs = ["...", "libcairo2-dev"]
 
 [start]
 cmd = "bash start.sh"

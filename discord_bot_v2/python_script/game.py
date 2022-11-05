@@ -3,6 +3,7 @@ import random
 import platform
 import multiprocessing
 from itertools import chain, groupby
+from pathlib import Path
 
 import chess
 import chess.svg
@@ -247,15 +248,16 @@ class Chess(Game):
         self.last_move = chess.Move.null()
         self.engine = chess.engine.UciProtocol()
         self.transport = None
+        self.path = Path(__file__).parent.parent
 
     async def info(self):
-        path = "resource/chess engines/" + (
+        path = self.path / "resource/chess engines/" / (
             "stockfish_14.1_win_x64.exe"
             if "Windows" in platform.platform()
             else "stockfish_14.1_linux_x64"
         )
 
-        self.transport, self.engine = await chess.engine.popen_uci(path)
+        self.transport, self.engine = await chess.engine.popen_uci(path.as_posix())
 
         hash_size = round(256 / self.chess_games_number)
         for game in self.game_template.values():
@@ -279,9 +281,9 @@ class Chess(Game):
                                         check=self.board.king(self.board.turn), size=500)
         else:
             svg_board = chess.svg.board(self.board, orientation=self.board.turn, lastmove=self.last_move, size=500)
-        cairosvg.svg2png(bytestring=svg_board, write_to="resource/temp/chess board.png")
+        cairosvg.svg2png(bytestring=svg_board, write_to=self.path / "resource/temp/chess board.png")
 
-        await self.channel.send(msg, file=discord.File("resource/temp/chess board.png"))
+        await self.channel.send(msg, file=discord.File(self.path / "resource/temp/chess board.png"))
 
     async def stop_game(self):
         await self.engine.quit()

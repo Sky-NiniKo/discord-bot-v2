@@ -1,4 +1,5 @@
 import random
+from pathlib import Path
 
 import discord
 from discord.ext import commands
@@ -22,6 +23,7 @@ class Command(commands.Cog):
         self.avatar_history = avatar_history
         self.statistics_sheet = Statistics(sheet_s)
         self.activity = activity
+        self.path = Path(__file__).parent.parent
         self.command_list = {"?": ("help", "aide", "?"), "=": ("=", "calc"), "clear_all": ("clearA", "videA", "purgeA"),
                              "clear": ("vide", "clear", "propre", "nettoyer", "purge"), "aliases": ("aliases", "alias"),
                              "connect_4": ("puissance_4", "connect_4", "puissance4", "connect4"), "dice": ("dé", "de"),
@@ -123,7 +125,8 @@ class Command(commands.Cog):
 
         msgs = []
         if answer <= 6:
-            msgs.append(await ctx.send(file=discord.File(f"resource/assets/dice/{answer}.png"), delete_after=3600))
+            msgs.append(await ctx.send(file=discord.File(self.path / f"resource/assets/dice/{answer}.png"),
+                                       delete_after=3600))
         msgs.append(await ctx.send(f"Le dé est tombé sur {answer}"))
         await self.quick_delete.add(msgs + [ctx.message])
         self.statistics_sheet.add(str(ctx.author), "dice")
@@ -140,7 +143,8 @@ class Command(commands.Cog):
     @commands.command(aliase=["pf"])
     async def pile_ou_face(self, ctx):
         answer = "Pile" if random.random() < 0.5 else "Face"
-        msg2 = await ctx.send(file=discord.File(f"resource/assets/piece/{answer.lower()}.png"), delete_after=3600)
+        msg2 = await ctx.send(file=discord.File(self.path / f"resource/assets/piece/{answer.lower()}.png"),
+                              delete_after=3600)
         msg = await ctx.send(answer)
         await self.quick_delete.add([msg, msg2, ctx.message])
         self.statistics_sheet.add(str(ctx.author), "pile_ou_face")
