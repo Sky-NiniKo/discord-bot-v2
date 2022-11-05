@@ -1,116 +1,22 @@
-from decimal import Decimal
+import subprocess
+import os
 
-import requests
-from sympy import sympify, symbols, plot, pretty, SympifyError, latex, solveset, Eq, simplify, zoo
-from sympy.plotting import plot3d
-
-from .utils import exit_after
-
-result_file = "resource/temp/result.png"
+if __name__ == '__main__':
+    from utils import exit_after
+else:
+    from .utils import exit_after
 
 
-def latex_need(c):
-    if c == zoo:
-        return True
-    try:
-        sympify(pretty(c))
-        return False
-    except SympifyError:
-        return True
-
-
-def decimal_range(x, y, jump):
-    x, jump = Decimal(x), Decimal(jump)
-    while x <= y:
-        yield round(float(x), 15)
-        x += jump
-
-
-def graph(calculation, **kwargs):
-    result = plot(sympify(calculation), show=False, **kwargs)
-    result.save(result_file)
-
-
-def graph3d(calculation, **kwargs):
-    result = plot3d(sympify(calculation), show=False, **kwargs)
-    result.save(result_file)
-
-
-def raw_calculate(calculation, return_str=False, return_approx=False):
-    ret = sympify(calculation, evaluate=False)
-    if return_approx:
-        approximation = ret.evalf()
-    else:
-        try:  # si Rationnel enlever la multiplication
-            approximation = ret.evalf() if (simplify(ret) == ret or ret.evalf() != ret) else None
-        except AttributeError:
-            approximation = None
-    ret = simplify(ret)
-    if latex_need(ret) and not return_str:
-        latex_str = latex(ret) if approximation is None else latex(ret) + r"\approx" + str(approximation)
-        with open(result_file, "wb") as file:
-            file.write(requests.get(
-                r"https://latex.codecogs.com/png.download?\dpi{110}%20\fn_phv%20\huge%20{\color{White}" + latex_str + "}").content)
-        return True
-    return (
-        pretty(ret)
-        if approximation is None
-        else f'{pretty(ret)} ≈ {str(approximation)}'
-    )
+QALC_PATH = os.environ.get('QALC_PATH', '/usr/bin/qalc')
 
 
 @exit_after(10)
-def calculate(calculation: str, raw=False, plot_2d=False, plot_3d=False, equation_solve=False, return_str=False,
-              return_approx=False):
-    if not raw:  # regarde si il n'y a pas un argument
-        if calculation.startswith("solve"):
-            equation_solve = True
-            calculation = calculation[6:]
-        elif calculation.startswith("graph3d"):
-            plot_3d = True
-            calculation = calculation[8:]
-        elif calculation.startswith("graph"):
-            plot_2d = True
-            calculation = calculation[6:]
-        elif calculation.startswith("appr"):
-            return_approx = True
-            calculation = calculation[5:]
-        else:
-            raw = True
-    if ";" not in calculation:
-        if raw or return_approx:
-            return raw_calculate(calculation, return_str, return_approx)
-        if plot_2d:
-            graph(calculation)
-            return True
-        if plot_3d:
-            graph3d(calculation)
-            return True
-        if equation_solve:
-            right, left = map(sympify, calculation.split("=")[:2])
-            solution = solveset(Eq(right, left))
-            if latex_need(solution) and not return_str:
-                with open(result_file, "wb") as file:
-                    file.write(requests.get(
-                        r"https://latex.codecogs.com/png.download?\dpi{110}%20\fn_phv%20\huge%20{\color{White}" + latex(solution) + "}").content)
-                return True
-            return pretty(solution)
-    calculation = calculation.split(";")
-    start, value, stop = calculation[1].split("<")[:3]
-    if ',' in stop:
-        stop, step = stop.split(",")[:2]
+def calculate(*args, calculation: str) -> str:
+    if calculation:
+        p = subprocess.Popen([QALC_PATH, calculation], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     else:
-        step = "1"
-    start, stop, step = float(sympify(start)), float(sympify(stop)), float(sympify(step))
-    if plot_2d:
-        graph(calculation[0], xlim=(start, stop))
-        return True
-    if abs((stop - start) / step) <= 30:
-        return "\n".join(
-            f"{value}={x}; " + str(float(sympify(calculation[0]).subs(symbols(value), x)))
-            for x in decimal_range(start, stop, step)
-        )
-    raise NotImplementedError
+        p = subprocess.Popen([QALC_PATH, *args], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return p.stdout.read().decode().strip()
 
 
 if __name__ == '__main__':
@@ -120,5 +26,5 @@ if __name__ == '__main__':
         import os
 
         os.environ['PATH'] = r'../resource/cairo/Windows' + ';' + os.environ['PATH']
-    result_file = "../" + result_file
-    print((calculate(input(), return_str=True)))
+    # result_file = "../" + result_file
+    print((calculate(calculation=input())))

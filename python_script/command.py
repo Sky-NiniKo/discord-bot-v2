@@ -53,32 +53,34 @@ class Command(commands.Cog):
     async def balancing(self, ctx, *equation):
         equation = " ".join(equation)
         if "=" in equation:
-            reactif, produit = equation.split("=")
+            reactives, products = equation.split("=")
         else:
-            reactif, produit = equation.split("->")
-        if not produit:
+            reactives, products = equation.split("->")
+        if not products:
             msg = await ctx.send("Votre équation n'est pas valide")
         else:
-            reac, prod = balance_stoichiometry(set(reactif.split("+")), set(produit.split("+")))
-            msg = await ctx.send(' + '.join(f"{num}{el.strip()}" for el, num in reac.items()) + " -> " + ' + '.join(f"{num}{el.strip()}" for el, num in prod.items()))
+            reac, prod = balance_stoichiometry(set(reactives.split("+")), set(products.split("+")), underdetermined=None)
+            msg = await ctx.send(
+                ' + '.join(f"{num}{el.strip()}" for el, num in reac.items())
+                + " -> " +
+                ' + '.join(f"{num}{el.strip()}" for el, num in prod.items())
+            )
         await self.quick_delete.add([msg, ctx.message])
         self.statistics_sheet.add(str(ctx.author), "balancing")
-            
 
     @commands.command(aliases=["=", "calc"])
     async def calculate(self, ctx):
         content = ctx.message.content
         try:
-            result = calculate(content[content.find("=") + 1:])
-            if result is True:
+            result = calculate(calculation=content[content.find("=") + 1:])
+            """if result is True:
                 msgs = [await ctx.send(file=discord.File("resource/temp/result.png"))]
             elif len(result) <= 10000:
                 msgs = []
                 for part in [result[index: index + 1974] for index in range(0, len(result), 1974)]:
                     msgs.append(await ctx.send(part))
-                msgs.reverse()
-            else:
-                msgs = [await ctx.send(result)]
+                msgs.reverse()"""
+            msgs = [await ctx.send(result)]
         except (ValueError, SyntaxError, IndexError, NotImplementedError):
             msgs = [await ctx.send("Désoler mais je ne peux pas calculer ceci.")]
         except KeyboardInterrupt:
@@ -99,7 +101,7 @@ class Command(commands.Cog):
 
     @commands.command(aliases=["clearA", "videA", "purgeA"])
     @commands.has_permissions(manage_messages=True)
-    async def clear_all(self, ctx, number: int):
+    async def clear_all(self, ctx, number):
         number = int(number)
         async for msg in ctx.message.channel.history(limit=number + 1):
             await msg.delete()

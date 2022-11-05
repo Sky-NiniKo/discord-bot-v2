@@ -1,31 +1,22 @@
 import os
 
 import gspread
-from discord import Asset, NotFound
+from discord import NotFound
 from discord.ext.commands import Bot
-from oauth2client.service_account import ServiceAccountCredentials
 
 from .utils import upload_image_on_imgur
 
 
-# decpreted
-def avatar_url(user):
-    return user.display_avatar.url
-    # return str(Asset._from_avatar(user._state, user, static_format="png", size=4096))
-
-
 class Sheet:
     def __init__(self, sheet_id: str):
-        scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets',
-                 "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
         with open(r"resource/credentials/gcreds.json", "r") as gcreds_file:
             is_ok = gcreds_file.read() != ""
         if not is_ok:
             with open(r"resource/credentials/gcreds.json", "w+") as gcreds_file:
                 gcreds_file.write(os.environ["gcreds"][:-1] + "," + os.environ["gcreds_private_key"] + "}")
-        gcreds = ServiceAccountCredentials.from_json_keyfile_name("resource/credentials/gcreds.json", scope)
-        client = gspread.authorize(gcreds)
+        client = gspread.service_account(filename="resource/credentials/gcreds.json")
 
+        # TODO: Use name instead of ID
         self.sheet = client.open_by_key(sheet_id).worksheets()[0]
 
 
@@ -46,7 +37,7 @@ class AvatarHistory(Sheet):
             col1 = self.sheet.col_values(1)
             if user_id not in col1:  # si l'utilisateur n'existe pas
                 self.sheet.insert_row(
-                    [user_id, str(user), avatar_url(user), upload_image_on_imgur(url=avatar_url(user))],
+                    [user_id, str(user), user.display_avatar.url, upload_image_on_imgur(url=user.display_avatar.url)],
                     len(col1) + 1)  # créé l'utilisateur
             else:
                 user_row = col1.index(user_id) + 1
@@ -55,10 +46,10 @@ class AvatarHistory(Sheet):
                 if str(user) not in user_names.split(" + "):  # si le nom a changé
                     self.sheet.update_cell(user_row, 2, f"{user_names} + {user}")  # mettre le nouveau nom
 
-                if avatar_url(user) != self.sheet.cell(user_row, 3).value:  # si l'avatar a changé
+                if user.display_avatar.url != self.sheet.cell(user_row, 3).value:  # si l'avatar a changé
                     self.sheet.update_cell(user_row, len(self.sheet.row_values(user_row)) + 1,
-                                           upload_image_on_imgur(url=avatar_url(user)))
-                    self.sheet.update_cell(user_row, 3, avatar_url(user))
+                                           upload_image_on_imgur(url=user.display_avatar.url))
+                    self.sheet.update_cell(user_row, 3, user.display_avatar.url)
 
 
 class SaveMsgs(Sheet):
