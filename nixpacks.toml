@@ -1,5 +1,5 @@
 [phases.setup]
-aptPkgs = ["..."]
+aptPkgs = ["...", "neovim"]
 
 [start]
 cmd = "bash start.sh"
