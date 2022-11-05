@@ -1,5 +1,5 @@
 [phases.setup]
-aptPkgs = ["...", "neovim"]
+nixPkgs = ["...", "qalc"]
 
 [start]
 cmd = "bash start.sh"
