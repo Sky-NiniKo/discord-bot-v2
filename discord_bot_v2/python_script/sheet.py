@@ -1,5 +1,6 @@
 import asyncio
 import os
+from pathlib import Path
 
 import gspread
 from discord import NotFound
@@ -10,12 +11,13 @@ from .utils import upload_image_on_imgur
 
 class Sheet:
     def __init__(self, sheet_id: str):
-        with open(r"resource/credentials/gcreds.json", "r") as gcreds_file:
+        creds_path = Path(__file__).parent.parent / "resource/credentials/gcreds.json"
+        with open(creds_path, "r") as gcreds_file:
             is_ok = gcreds_file.read() != ""
         if not is_ok:
-            with open(r"resource/credentials/gcreds.json", "w+") as gcreds_file:
+            with open(creds_path, "w+") as gcreds_file:
                 gcreds_file.write(os.environ["gcreds"][:-1] + "," + os.environ["gcreds_private_key"] + "}")
-        client = gspread.service_account(filename="resource/credentials/gcreds.json")
+        client = gspread.service_account(filename=creds_path.as_posix())
 
         # TODO: Use name instead of ID
         self.sheet = client.open_by_key(sheet_id).worksheets()[0]
