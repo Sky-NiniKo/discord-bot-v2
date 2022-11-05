@@ -346,17 +346,6 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
-name = "discord"
-version = "2.0.0"
-description = "A mirror package for discord.py. Please install that instead."
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-"discord.py" = ">=2.0.0"
-
-[[package]]
 name = "discord-py"
 version = "2.0.1"
 description = "A Python wrapper for the Discord API"
@@ -1522,7 +1511,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "4393917ead9458cd405a39c1ed579e7548e83a959d99ab9595f62189513ec54d"
+content-hash = "79c2ba9380e295bde506316b984e4e90a62d53f794fbda40a5b5bb7fc7c1e635"
 
 [metadata.files]
 aiohttp = [
@@ -1879,10 +1868,6 @@ decorator = [
 defusedxml = [
     {file = "defusedxml-0.7.1-py2.py3-none-any.whl", hash = "sha256:a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61"},
     {file = "defusedxml-0.7.1.tar.gz", hash = "sha256:1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69"},
-]
-discord = [
-    {file = "discord-2.0.0-py3-none-any.whl", hash = "sha256:ffc714978d338d2b506e4924d66d7d02a649378a46743e2bdf42ef1bd43d1a67"},
-    {file = "discord-2.0.0.tar.gz", hash = "sha256:b6df1dd56c19750b3cb9b69de85bf463e712a0db232546ae8109c04bf0a61083"},
 ]
 discord-py = [
     {file = "discord.py-2.0.1-py3-none-any.whl", hash = "sha256:aeb186348bf011708b085b2715cf92bbb72c692eb4f59c4c0b488130cc4c4b7e"},
