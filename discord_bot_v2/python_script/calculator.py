@@ -7,8 +7,7 @@ else:
     from .utils import exit_after
 
 
-QALC_PATH = os.environ.get('QALC_PATH', subprocess.Popen(["nix", "eval", "nixpkgs.libqalculate.outPath"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.read().decode())
-print(QALC_PATH)
+QALC_PATH = os.environ.get('QALC_PATH', "/usr/bin/qalc")
 
 
 @exit_after(10)

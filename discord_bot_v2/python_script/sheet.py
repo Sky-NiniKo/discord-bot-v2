@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 import gspread
-from discord import NotFound
+from discord import NotFound, Message
 from discord.ext.commands import Bot
 
 from .utils import upload_image_on_imgur
@@ -103,7 +103,7 @@ class SaveMsgs(Sheet):
                 self.sheet.delete_row(row_number - delete_row)
                 delete_row += 1
                 for msg in msgs:
-                    if str(msgs[0].channel.type) != "private" or msg.author == self.bot.user:
+                    if isinstance(msg, Message) and (str(msgs[0].channel.type) != "private" or msg.author == self.bot.user):
                         await msg.delete()
             else:
                 values.append(msgs)
