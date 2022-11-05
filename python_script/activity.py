@@ -39,6 +39,7 @@ class Activity:
 
     async def __init_events__(self):
         self.events = await self.sheet.get()
+        print("Initialisation des Events terminé\n")
 
     def add(self, event_date, event_type, activity_name):
         self.events[event_date] = [event_type, activity_name]
@@ -67,17 +68,21 @@ class Activity:
 
         if len(self.events) >= 1 and str(day) in self.events:  # événement rajouter manuellement
             event_type, activity_name = self.events[str(day)]
-            await self.change_to(event_type=event_type, activity_name=activity_name)
-        elif day == date(year, 12, 24):  # noël
-            await self.change_to(activity_name="est triste car il n'a pas eu de cadeaux", emoji="😭")
-        elif day == date(year, 7, 14):  # 14 juillet
-            await self.change_to("regarde", "tous les anciens défilés")
-        elif day == easter_date():  # pâque
-            await self.change_to("joue", "récolter des œufs en chocolat")
-        else:
-            random.seed(str(day))  # faire en sorte que l'aléatoire dépende du jour
-            event_type, activity_name = random.choice(self.activities)  # activité aléatoire
-            await self.change_to(event_type, activity_name)
+            return await self.change_to(event_type=event_type, activity_name=activity_name)
+
+        match day:
+            case date(year, 12, 24):  # noël
+                await self.change_to(activity_name="est triste car il n'a pas eu de cadeaux", emoji="😭")
+            case date(year, 7, 14):  # 14 juillet
+                await self.change_to("regarde", "la France défiler", emoji="🇫🇷")
+            case date(year, 10, 31):  # halloween
+                await self.change_to("joue", "jeter des sorts", emoji="🎃")
+            case easter_date():  # pâque
+                await self.change_to("joue", "récolter des œufs en chocolat", emoji="🍫")
+            case _:
+                random.seed(str(day))  # faire en sorte que l'aléatoire dépende du jour
+                event_type, activity_name = random.choice(self.activities)  # activité aléatoire
+                await self.change_to(event_type, activity_name)
 
     def get_event_list(self) -> list:
         dates = list(self.events.keys())

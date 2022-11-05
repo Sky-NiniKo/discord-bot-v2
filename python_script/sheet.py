@@ -1,3 +1,4 @@
+import asyncio
 import os
 
 import gspread
@@ -79,24 +80,24 @@ class SaveMsgs(Sheet):
     async def get(self):
         values = []
         delete_row = 0
+
+        async def get_cell_msg(channel, msg_id):
+            if msg_id == "To Delete":
+                return True
+            try:
+                if msg_id:
+                    return await channel.fetch_message(msg_id)
+            except NotFound:
+                return True
+
         for row_number, row in enumerate(self.sheet.get_all_values(), start=1):
             if not row[0]:
                 self.sheet.delete_row(row_number - delete_row)
                 delete_row += 1
                 continue
-            channel = await self.bot.fetch_channel(row[0])
-            msgs = []
-            error = False
-            for ID in row[1:]:  # tout sauf le premier, car c'est l'ID du channel
-                if ID == "To Delete":
-                    error = True
-                    continue
-                try:
-                    if ID:
-                        msgs.append(await channel.fetch_message(ID))
-                except NotFound:
-                    error = True
-            if error:
+            msgs = await asyncio.gather(*[get_cell_msg(await self.bot.fetch_channel(row[0]), ID) for ID in row[1:]])
+            msgs: tuple = tuple(msg for msg in msgs if msg is not None)
+            if True in msgs:
                 self.sheet.delete_row(row_number - delete_row)
                 delete_row += 1
                 for msg in msgs:

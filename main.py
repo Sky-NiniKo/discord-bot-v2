@@ -58,23 +58,7 @@ async def on_ready():
     if OWNER:
         bot.owner_id = OWNER
 
-    try:
-        print("Initialisation des événements.", end=" ")
-        await activity.__init_events__()
-        print("Terminé\nInitialisation de Quick Delete")
-        bot.loop.create_task(quick_delete.__init_my_msgs__())
-        print("Mise à jours des game_template et changement des activités\n")
-        await game.update_game_template()
-        await activity.change()
-
-        tomorrow = (date.today() + timedelta(days=1)).day
-        while date.today().day == tomorrow:
-            await asyncio.sleep(1)
-        everyday_task.start()
-    except Exception as e:
-        await send_error(e, bot.owner_id, "Il y a eu une erreur après le on_ready")
-        import traceback as tb
-        print(''.join(tb.format_exception(None, e, e.__traceback__)))
+    everyday_task.start()
 
 
 @bot.event
@@ -124,14 +108,21 @@ async def on_raw_reaction_remove(payload):
 
 @tasks.loop(hours=24)
 async def everyday_task():
-    print("Mise à jours des game_template et changement des activités\n")
+    print("Mise à jours des game_template et changement des activités")
     await game.update_game_template()
     await activity.change()
-    print("Mise à jours de l'historique des avatars")
+    print("Mise à jours de l'historique des avatars\n")
     _thread.start_new_thread(avatar_history.update, ())
+
+
+async def main():
+    async with bot:
+        bot.loop.create_task(activity.__init_events__())
+        bot.loop.create_task(quick_delete.__init_my_msgs__())
+        await bot.start(DISCORD_BOT_TOKEN)
 
 
 # lancement du bot
 chrono = time.time()
 print(f"Lancement du bot après {round(time.time() - start, 3)}s")
-bot.run(DISCORD_BOT_TOKEN)
+asyncio.run(main())
