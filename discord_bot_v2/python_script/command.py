@@ -74,14 +74,14 @@ class Command(commands.Cog):
     async def calculate(self, ctx):
         content = ctx.message.content
         try:
-            result = calculate(calculation=content[content.find("=") + 1:])
-            """if result is True:
-                msgs = [await ctx.send(file=discord.File("resource/temp/result.png"))]
+            result = calculate(calculation=content[content.find("=") + 1:], output=self.path / "resource/temp/result.png")
+            if result is True:
+                msgs = [await ctx.send(file=discord.File(self.path / "resource/temp/result.png"))]
             elif len(result) <= 10000:
                 msgs = []
                 for part in [result[index: index + 1974] for index in range(0, len(result), 1974)]:
                     msgs.append(await ctx.send(part))
-                msgs.reverse()"""
+                msgs.reverse()
             msgs = [await ctx.send(result)]
         except (ValueError, SyntaxError, IndexError, NotImplementedError):
             msgs = [await ctx.send("Désoler mais je ne peux pas calculer ceci.")]
@@ -140,7 +140,7 @@ class Command(commands.Cog):
         await self.quick_delete.add([msg, ctx.message])
         self.statistics_sheet.add(str(ctx.author), "event_list")
 
-    @commands.command(aliase=["pf"])
+    @commands.command(aliases=["pf"])
     async def pile_ou_face(self, ctx):
         answer = "Pile" if random.random() < 0.5 else "Face"
         msg2 = await ctx.send(file=discord.File(self.path / f"resource/assets/piece/{answer.lower()}.png"),

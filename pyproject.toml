@@ -16,7 +16,7 @@ chess = "^1.9.3"
 python-dotenv = "^0.21.0"
 chempy = "^0.8.2"
 discord-py = "^2.0.1"
-
+lui-calculator = {git = "https://git@github.com/Sky-NiniKo/LUI-calculator.git"}
 
 [build-system]
 requires = ["poetry-core"]

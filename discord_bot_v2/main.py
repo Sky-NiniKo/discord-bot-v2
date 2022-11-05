@@ -107,7 +107,7 @@ async def on_raw_reaction_remove(payload):
 
 @tasks.loop(hours=24)
 async def everyday_task():
-    print("Mise à jours des game_template et changement des activités")
+    print("Mise à jours des game_template et changement de l'activité")
     await game.update_game_template()
     await activity.change()
     print("Mise à jours de l'historique des avatars\n")
