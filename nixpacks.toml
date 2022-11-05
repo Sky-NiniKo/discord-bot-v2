@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["...", "poppler_utils"]
+nixPkgs = ["...", "libqalculate", "cairo"]
 
 [start]
 cmd = "bash start.sh"
