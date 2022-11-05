@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["...", "libqalculate", "python310Packages.pycairo"]
+nixPkgs = ["...", "libqalculate", "cairo"]
 
 [start]
 cmd = "bash start.sh"
