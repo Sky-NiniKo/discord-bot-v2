@@ -1,5 +1,5 @@
 [phases.setup]
-aptPkgs = ["...", "qalc"]
+aptPkgs = ["..."]
 
 [start]
 cmd = "bash start.sh"
