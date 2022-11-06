@@ -53,12 +53,15 @@ class Game:
         await self.quick_delete.wait_for_ok()
         self.quick_delete.save.add_to_delete(self.msg)
 
+    async def quit(self):
+        await self.channel.delete()
+        self.quick_delete.save.remove(msg=self.msg)
+        await self.msg.delete()
+        del self.game_template[self.channel]
+
     async def super_message(self, first_arg):
         if first_arg in generate_implicit(("close", "quit", "exit")):
-            await self.channel.delete()
-            self.quick_delete.save.remove(msg=self.msg)
-            await self.msg.delete()
-            del self.game_template[self.channel]
+            await self.quit()
             return True
         elif first_arg in generate_implicit(("replay", "save")):
             await self.channel.send(f"Voici le replay :\n{self.replay_separation.join(self.replay)}"
@@ -257,13 +260,17 @@ class Chess(Game):
             else "stockfish_15_x64_popcnt"
         )
 
-        self.transport, self.engine = await chess.engine.popen_uci(path.as_posix())
+        try:
+            self.transport, self.engine = await chess.engine.popen_uci(path.as_posix())
 
-        hash_size = 256 // self.chess_games_number
-        for game in self.game_template.values():
-            if isinstance(game, Chess):
-                await game.update_hash(hash_size)
-        await self.engine.configure({"Threads": multiprocessing.cpu_count()})
+            hash_size = 256 // self.chess_games_number
+            for game in self.game_template.values():
+                if isinstance(game, Chess):
+                    await game.update_hash(hash_size)
+            await self.engine.configure({"Threads": multiprocessing.cpu_count()})
+        except FileNotFoundError as e:
+            await self.channel.send("Problème technique ! Le moteur ne fonctionne pas... Vous ne pouvez ni jouer contre"
+                                    " l'ordinateur ni analyser les parties.")
 
         players_name = ", ".join(map(lambda player: player.name, self.players[:-1])) + " et " + self.players[-1].name
         await self.channel.send(
@@ -281,9 +288,10 @@ class Chess(Game):
                                         check=self.board.king(self.board.turn), size=500)
         else:
             svg_board = chess.svg.board(self.board, orientation=self.board.turn, lastmove=self.last_move, size=500)
-        cairosvg.svg2png(bytestring=svg_board, write_to=self.path / "resource/temp/chess board.png")
+        path = (self.path / "resource/temp/chess board.png").as_posix()
+        cairosvg.svg2png(bytestring=svg_board, write_to=path)
 
-        await self.channel.send(msg, file=discord.File(self.path / "resource/temp/chess board.png"))
+        await self.channel.send(msg, file=discord.File(path))
 
     async def stop_game(self):
         await self.engine.quit()
@@ -302,7 +310,7 @@ class Chess(Game):
         self.draw = {player: False for player in self.players}
         await self.send_board(f"C'est à {self.players[self.player].mention}")
 
-        if self.show_analyse:
+        if self.show_analyse and self.engine.id:
             analyse = await self.engine.analyse(self.board, chess.engine.Limit(time=0.1))
             score = analyse["score"].white()
             if isinstance(score, chess.engine.Cp):
@@ -313,12 +321,12 @@ class Chess(Game):
                 color = "blancs" if mate > 0 else "noirs"
                 await self.channel.send(f"Mate en {abs(mate)} coups pour les {color}.")
 
-        if self.players[self.player] == self.bot.user:
+        if self.players[self.player] == self.bot.user and self.engine.id:
             response = requests.get(
                 f"https://tablebase.lichess.ovh/standard?fen={self.board.fen()}")  # permet de conclure en fin de partie
             response = json.loads(str(response.content, encoding=response.apparent_encoding))
-            if any((response['wdl'], response['dtz'], response['dtm'])):
-                if any(map(lambda x: x < 0, (response['wdl'], response['dtz'], response['dtm']))):
+            if any((response['dtz'], response['dtm'])):
+                if any(map(lambda x: x < 0, (response['dtz'], response['dtm']))):
                     await self.resigns()
                     return
                 move = self.board.parse_uci(response['moves'][0]['uci'])
@@ -370,10 +378,10 @@ class Chess(Game):
                 self.show_analyse = not self.show_analyse
         elif not self.stop:
             if first_arg in generate_implicit(("nul", "=")):
+                self.draw[ctx.message.author] = not self.draw[ctx.message.author]
                 if all(self.draw.values()):
                     await self.channel.send("Les joueurs se sont mis d'accord sur un match nul.")
                     await self.stop_game()
-                self.draw[ctx.message.author] = not self.draw[ctx.message.author]
                 cancel = not self.draw[ctx.message.author]
                 await self.channel.send(
                     f"{ctx.author.name} à {'demander un' * self.draw[ctx.message.author]}{'annuler son' * cancel} nul.")
@@ -383,7 +391,7 @@ class Chess(Game):
                 self.draw = {player: False for player in self.players}
             elif first_arg in generate_implicit(("forfait", "abandon")):
                 await self.resigns()
-            else:
+            elif ctx.author == self.players[self.player]:
                 try:
                     try:
                         move = self.board.push_san(
@@ -416,7 +424,8 @@ class Chess(Game):
             self.draw = {player: False for player in self.players}
 
     async def update_hash(self, size):
-        await self.engine.configure({"Hash": size})
+        if self.engine.id and not self.stop:
+            await self.engine.configure({"Hash": size})
 
 
 class GameEngine:

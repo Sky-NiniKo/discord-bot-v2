@@ -10,7 +10,7 @@ else:
     from .utils import exit_after
 
 
-QALC_PATH = [os.environ.get('QALC_PATH', "/usr/bin/qalc")]
+QALC_PATH = os.environ.get('QALC_PATH', "/usr/bin/qalc")
 
 
 @exit_after(10)
@@ -21,7 +21,7 @@ def calculate(*args, calculation: str, output: str | Path = "output.png") -> str
         else:
             p = subprocess.Popen([QALC_PATH, *args], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         return p.stdout.read().decode().strip()
-    except (FileNotFoundError, TypeError):
+    except FileNotFoundError:
         return lui_calculator.calc(calculation, latex=None, output=output)
 
 

@@ -1,5 +1,6 @@
 [phases.setup]
-nixPkgs = ["...", "glibc", "libqalculate", "python310Packages.cairosvg"]
+qptPkgs = ["...", "glibc"]
+nixPkgs = ["...", "libqalculate", "python310Packages.cairosvg"]
 
 [start]
 cmd = "bash start.sh"

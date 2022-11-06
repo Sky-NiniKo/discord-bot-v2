@@ -24,8 +24,8 @@ class QuickDelete:
     async def add(self, msgs):
         self.my_msg[msgs[0].id] = msgs
         await msgs[0].add_reaction("🗑️")
-        await self.wait_for_ok()
-        self.save.add(msgs)
+        # await self.wait_for_ok()
+        # self.save.add(msgs)
 
     async def delete(self, payload):
         message_id = payload.message_id  # récupérer le numéro du message

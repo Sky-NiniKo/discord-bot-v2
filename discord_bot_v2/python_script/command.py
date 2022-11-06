@@ -77,12 +77,13 @@ class Command(commands.Cog):
             result = calculate(calculation=content[content.find("=") + 1:], output=self.path / "resource/temp/result.png")
             if result is True:
                 msgs = [await ctx.send(file=discord.File(self.path / "resource/temp/result.png"))]
-            elif len(result) <= 10000:
+            elif 1_974 <= len(result) <= 10_000:
                 msgs = []
                 for part in [result[index: index + 1974] for index in range(0, len(result), 1974)]:
                     msgs.append(await ctx.send(part))
                 msgs.reverse()
-            msgs = [await ctx.send(result)]
+            else:
+                msgs = [await ctx.send(result)]
         except (ValueError, SyntaxError, IndexError, NotImplementedError):
             msgs = [await ctx.send("Désoler mais je ne peux pas calculer ceci.")]
         except KeyboardInterrupt:

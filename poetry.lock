@@ -705,7 +705,7 @@ testing = ["flake8 (>=5.0)", "mypy (>=0.982)", "pytest (>=7.0)", "pytest-cov (>=
 type = "git"
 url = "https://git@github.com/Sky-NiniKo/LUI-calculator.git"
 reference = "HEAD"
-resolved_reference = "c8516279385166474d470024066eb169f119c787"
+resolved_reference = "3aedc8e449cf82c406aa91b0ef0ea5b7090a8a18"
 
 [[package]]
 name = "markupsafe"
