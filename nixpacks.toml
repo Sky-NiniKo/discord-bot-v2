@@ -1,5 +1,4 @@
 [phases.setup]
-aptPkgs = ["...", "glibc"]
 nixPkgs = ["...", "libqalculate", "python310Packages.cairosvg"]
 
 [start]
