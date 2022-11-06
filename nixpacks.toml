@@ -1,5 +1,6 @@
 [phases.setup]
-aptPkgs = ["...", "glibc", "qalc", "cairo"]
+aptPkgs = ["...", "glibc"]
+nixPkgs = ["...", "libqalculate", "python310Packages.cairosvg"]
 
 [start]
 cmd = "bash start.sh"
