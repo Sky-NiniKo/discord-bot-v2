@@ -1,5 +1,5 @@
 [phases.setup]
-qptPkgs = ["...", "glibc", "qalc", "cairo"]
+aptPkgs = ["...", "glibc", "qalc", "cairo"]
 
 [start]
 cmd = "bash start.sh"
